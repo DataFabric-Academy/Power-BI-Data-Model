@@ -12,6 +12,42 @@
 > - **VertiPaq Engine** ถูกปูพื้นฐานตั้งแต่ต้นเพื่อให้เข้าใจการทำงานของ Storage Engine
 > - เข้าใจความสำคัญของ **Low Cardinality** และ **Sorted Data** ต่อประสิทธิภาพของ Semantic Model
 
+> **Data Source หลักของหลักสูตร**: **AdventureWorksDW2025** — ดูวิธีเชื่อมต่อและติดตั้งได้ที่ [02-Data-Sources](./02-Data-Sources/) หรือดาวน์โหลด [AdventureWorksDW2025.bak](https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorksDW2025.bak) พร้อมวิธี restore จาก [AdventureWorks sample databases - Microsoft Learn](https://learn.microsoft.com/sql/samples/adventureworks-install-configure)
+
+## เวลาเรียนรวม 12 ชั่วโมง ⏱️ (สอนด้วย Power BI Desktop)
+
+> **เงื่อนไขหลักสูตร:** ใช้เวลาสอนรวม**ไม่เกิน 12 ชั่วโมง** สอนบน **Power BI Desktop** เป็นหลัก — งานที่เคยต้องใช้ External Tool ปัจจุบันทำใน Desktop ได้เอง (Model view, DAX Query View, TMDL View) ส่วน External Tools (DAX Studio / Tabular Editor) ใช้เป็นเครื่องมือเสริม
+
+| โมดูล | เวลาเรียน |
+|-------|-----------|
+| 01-Introduction & VertiPaq Engine (รวม Desktop Views + External Tools) | 1.5 ชม. |
+| 02-Data-Sources | 1.0 ชม. |
+| 03-Data-Modeling-Basics | 0.5 ชม. |
+| 04-Relationships ⭐ หัวใจของหลักสูตร | 2.0 ชม. |
+| 05-Dimension-Table-Design | 1.0 ชม. |
+| 06-Date-Dimensions-Relationships | 1.5 ชม. |
+| 07-Fact-Tables-Design (Calculation Groups) | 1.5 ชม. |
+| 08-Performance-Optimization | 1.0 ชม. |
+| 09-Best-Practices | 0.5 ชม. |
+| 10-Advanced-Modeling | 1.0 ชม. |
+| 11-Case-Studies | 0.5 ชม. |
+| **รวม** | **12.0 ชั่วโมง** |
+
+> **โมดูล 12 (Security-RLS) และ 13 (Incremental Refresh-Partitioning)** เป็น **ส่วนขยายสำหรับศึกษาเพิ่มเติมนอกเวลาเรียน** (self-study) ไม่นับรวมใน 12 ชั่วโมง
+
+## ของใหม่ที่นำมาอัปเดตหลักสูตร (Power BI Desktop 2025–2026) 🆕
+
+อ้างอิงจาก [Microsoft Learn](https://learn.microsoft.com/power-bi/fundamentals/desktop-latest-update-archive) และ [Power BI Blog](https://powerbi.microsoft.com/blog/):
+
+| ฟีเจอร์ใหม่ | สถานะ | ใช้ในโมดูล |
+|------------|-------|-----------|
+| สร้าง **Calculation Groups** ใน Model view ของ Desktop (ไม่ต้องใช้ Tabular Editor) | GA | 07 |
+| **TMDL View** — แก้ model metadata ด้วยโค้ด รวมถึง `IsAvailableInMDX` | GA (ก.ย. 2025) | 01, 05 |
+| **DAX Query View** — เขียน/ทดสอบ DAX Query ใน Desktop + Quick Queries | GA | 01, 07 |
+| **Direct Lake ใน Power BI Desktop** — live edit จาก Desktop + ผสม Direct Lake/Import ได้ใน model เดียว | GA (ก.ย. 2025) | 02 |
+| **Enhanced DAX Time Intelligence** — Custom Calendar (ปีงบ/4-5-4), `TOTALWTD`, `PREVIOUSWEEK` | Preview (ก.ย. 2025) | 06 |
+| **DAX User-Defined Functions** — สร้างฟังก์ชัน DAX ใช้ซ้ำได้ | Preview (มี.ค. 2026) | อ่านเพิ่มเติม |
+
 ## โครงสร้างหลักสูตร
 
 ### 01-Introduction & VertiPaq Engine ⭐ **ปูพื้นฐานสำคัญ**
@@ -138,7 +174,7 @@
 - Best Practices จากกรณีศึกษา
 - การประยุกต์ใช้ VertiPaq Engine Knowledge
 
-### 12-Security-RLS
+### 12-Security-RLS (ศึกษาเพิ่มเติมนอกเวลาเรียน)
 - Row-Level Security (RLS) แบบ Static และ Dynamic
 - Object-Level Security (OLS)
 - Table-Level Security
@@ -146,7 +182,7 @@
 - การใช้ DAX สำหรับ Security Filters
 - Security Best Practices
 
-### 13-Incremental-Refresh-Partitioning
+### 13-Incremental-Refresh-Partitioning (ศึกษาเพิ่มเติมนอกเวลาเรียน)
 - Incremental Refresh Policy
 - การจัดการ Partitions
 - Retention Policies

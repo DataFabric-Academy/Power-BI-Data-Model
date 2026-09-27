@@ -4,7 +4,8 @@
 
 ไฟล์นี้รวบรวมตัวอย่างโค้ดสำหรับการออกแบบ Dimension Table โดยเฉพาะ SCD Type 2
 
-> **ไฟล์ตัวอย่าง:** `Data Model SCD.SemanticModel` และ `Data Model SCD.Report`
+> **ไฟล์ตัวอย่าง:** `Data Model SCD.pbix`
+> **หมายเหตุ:** ไฟล์ตัวอย่างเป็นสื่อการสอนของผู้สอน (Trainer Material) — ขอไฟล์ได้จากผู้สอนระหว่างเรียน ไม่ได้แจกจ่ายผ่าน repository นี้
 
 ---
 

@@ -66,3 +66,8 @@ Desktop.ini
 # Visual Studio Code
 .vscode/
 
+# Trainer Material
+Trainer_Docs/
+
+# ZCode session artifacts
+.zcode/

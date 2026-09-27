@@ -6,11 +6,11 @@
 
 ---
 
-## 🎯 แบบฝึกหัดที่ 1: เชื่อมต่อ AdventureWorksDW
+## 🎯 แบบฝึกหัดที่ 1: เชื่อมต่อ AdventureWorksDW2025
 
 ### วัตถุประสงค์
 
-เรียนรู้วิธีเชื่อมต่อกับ AdventureWorksDW ซึ่งเป็น Data Source หลักของหลักสูตรนี้
+เรียนรู้วิธีเชื่อมต่อกับ AdventureWorksDW2025 ซึ่งเป็น Data Source หลักของหลักสูตรนี้
 
 ---
 
@@ -29,14 +29,14 @@
 **Step 2.1:** ไปที่ **Home** → **Get Data** → **Azure** → **Azure SQL Database**
 
 **Step 2.2:** กรอกข้อมูลการเชื่อมต่อ:
-- **Server:** `xxx.database.windows.net`
-- **Database:** `AdventureworksDW`
+- **Server:** `ake.database.windows.net`
+- **Database:** `AdventureWorksDW2025`
 - คลิก **OK**
 
 **Step 2.3:** เลือก Authentication Mode:
 - เลือก **Database** (Database Authentication)
-- **Username:** `student`
-- **Password:** `Pa55w.rd`
+- **Username:** `dwuser`
+- **Password:** `<password ที่ได้รับจากผู้สอน>`
 - คลิก **Connect**
 
 **Step 2.4:** รอให้ Power BI Desktop เชื่อมต่อกับ Azure SQL Database (อาจใช้เวลาสักครู่)
@@ -63,7 +63,7 @@
 
 ### ขั้นตอนที่ 4: เลือก Tables ที่ต้องการ
 
-**Step 4.1:** ใน Navigator จะเห็น Tables ทั้งหมดใน AdventureWorksDW
+**Step 4.1:** ใน Navigator จะเห็น Tables ทั้งหมดใน AdventureWorksDW2025
 
 **Step 4.2:** เลือก Tables ต่อไปนี้ (ติ๊กถูก):
 - ✅ **FactResellerSales** (Fact Table)
@@ -104,8 +104,8 @@
 1. **เชื่อมต่อสำเร็จหรือไม่?**
    - **คำตอบ:** ตรวจสอบว่า Tables ทั้ง 4 ตารางแสดงผลใน Model View
 
-2. **มีตารางอะไรบ้างใน AdventureWorksDW?**
-   - **คำตอบ:** AdventureWorksDW มี Tables หลายตาราง เช่น FactInternetSales, FactResellerSales, FactSalesQuota, DimProduct, DimDate, DimReseller, DimCustomer, DimGeography, DimEmployee, DimPromotion
+2. **มีตารางอะไรบ้างใน AdventureWorksDW2025?**
+   - **คำตอบ:** AdventureWorksDW2025 มี Tables หลายตาราง เช่น FactInternetSales, FactResellerSales, FactSalesQuota, DimProduct, DimDate, DimReseller, DimCustomer, DimGeography, DimEmployee, DimPromotion
 
 3. **Fact Tables และ Dimension Tables มีอะไรบ้าง?**
    - **Fact Tables:** FactInternetSales, FactResellerSales, FactSalesQuota
@@ -616,7 +616,7 @@ in
    - Import Mode = Pre-loading (โหลดทั้งหมดก่อน)
    - DirectQuery = Query เฉพาะที่ต้องการ
    - Direct Lake = อ่านเฉพาะ Columns/Rows ที่ต้องการจาก Parquet files
-4. **ใช้ AdventureWorksDW** เป็น Data Source หลักของหลักสูตรนี้
+4. **ใช้ AdventureWorksDW2025** เป็น Data Source หลักของหลักสูตรนี้
 5. **แยก DateTime** เป็น Date และ Time เพื่อลด Cardinality
 6. **เรียงข้อมูล** ก่อน Import เพื่อเพิ่มประสิทธิภาพ RLE Encoding
 

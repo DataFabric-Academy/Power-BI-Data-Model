@@ -2,7 +2,7 @@
 
 ## 📚 เอกสารแบบฝึกหัดสำหรับการฝึกปฏิบัติ
 
-ไฟล์นี้รวบรวมแบบฝึกหัดแบบ Step-by-Step สำหรับโมดูล Case Studies โดยใช้ AdventureWorksDW เป็นตัวอย่าง
+ไฟล์นี้รวบรวมแบบฝึกหัดแบบ Step-by-Step สำหรับโมดูล Case Studies โดยใช้ AdventureWorksDW2025 เป็นตัวอย่าง
 
 ---
 
@@ -22,7 +22,7 @@
 
 ---
 
-### ขั้นตอนที่ 1: เชื่อมต่อกับ AdventureWorksDW
+### ขั้นตอนที่ 1: เชื่อมต่อกับ AdventureWorksDW2025
 
 **Step 1.1:** เปิด Power BI Desktop
 
@@ -30,7 +30,7 @@
 
 **Step 1.3:** กรอกข้อมูลการเชื่อมต่อ:
 - **Server:** `your-server.database.windows.net` (หรือชื่อเซิร์ฟเวอร์ที่คุณมี)
-- **Database:** `AdventureWorksDW`
+- **Database:** `AdventureWorksDW2025`
 - เลือก **Import Mode**
 
 **Step 1.4:** เลือกตารางต่อไปนี้:

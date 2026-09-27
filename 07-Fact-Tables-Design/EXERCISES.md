@@ -4,7 +4,7 @@
 
 ไฟล์นี้รวบรวมแบบฝึกหัดแบบ Step-by-Step สำหรับ Explicit Measures และ Calculation Groups โดยรวม Code Examples และคำอธิบายที่ละเอียด
 
-> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW**
+> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW2025**
 
 ---
 
@@ -20,7 +20,7 @@
 
 **Step 1.1:** เปิด Power BI Desktop
 
-**Step 1.2:** เปิดไฟล์ที่มี AdventureWorksDW Semantic Model
+**Step 1.2:** เปิดไฟล์ที่มี AdventureWorksDW2025 Semantic Model
 
 **Step 1.3:** เลือก Table `FactResellerSales`
 
@@ -301,7 +301,9 @@ Sales - Bikes = CALCULATE(SUM(...), DimProduct[Category] = "Bikes")
 
 **Step 1.1:** เปิด Power BI Desktop
 
-**Step 1.2:** เปิดไฟล์ `Data Model - Basic Calculation Group.SemanticModel`
+**Step 1.2:** เปิดไฟล์ `Data Model Time Intelligence with Calculation Group.pbix`
+
+> **หมายเหตุ:** ไฟล์ตัวอย่างเป็นสื่อการสอนของผู้สอน (Trainer Material) — ขอไฟล์ได้จากผู้สอนระหว่างเรียน ไม่ได้แจกจ่ายผ่าน repository นี้
 
 **Step 1.3:** ไปที่ **Model View**
 
@@ -458,16 +460,20 @@ calculationItem LY = CALCULATE(SELECTEDMEASURE(), SAMEPERIODLASTYEAR(...))
 
 ### ขั้นตอนที่ 1: สร้าง Calculation Group
 
-**Step 1.1:** เปิด External Tool - Tabular Editor
+**Step 1.1:** สร้าง Calculation Group ใน Power BI Desktop (วิธีหลัก - GA)
 
-**หมายเหตุ:** Calculation Groups ต้องสร้างผ่าน Tabular Editor หรือ Tabular Editor 3 (Open Source)
+> **ของใหม่:** ตั้งแต่ปี 2024 เป็นต้นมา สามารถสร้าง Calculation Group ได้โดยตรงใน **Model view** ของ Power BI Desktop ไม่ต้องใช้ External Tool อีกต่อไป (อ้างอิง: [Create calculation groups - Microsoft Learn](https://learn.microsoft.com/power-bi/transform-model/calculation-groups))
 
-**Step 1.2:** ใน Tabular Editor:
-1. Right-click ที่ **Tables**
-2. เลือก **Create New** → **Calculation Group**
+1. ไปที่ **Model view** ใน Power BI Desktop
+2. ใน ribbon เลือกปุ่ม **Calculation group**
+3. Power BI จะสร้าง Calculation Group พร้อม Calculation Item แรกให้อัตโนมัติ
+4. ถ้าโมเดลยังไม่ได้เปิด **Discourage implicit measures** Power BI จะถามให้เปิด — เลือก **เปิด** (Calculation Item ทำงานกับ Explicit Measures เท่านั้น)
 
-**Step 1.3:** ตั้งชื่อ Calculation Group:
-- พิมพ์: `Time Intelligence`
+**Step 1.2:** ตั้งชื่อ Calculation Group:
+- ตั้งชื่อเป็น: `Time Intelligence`
+
+**Step 1.3 (ทางเลือก): สร้างผ่าน Tabular Editor**
+- ถ้าต้องการสร้างผ่าน External Tool: เปิด **External Tools** > **Tabular Editor**, Right-click ที่ **Tables** > **Create New** → **Calculation Group** แล้วตั้งชื่อ `Time Intelligence`
 
 ---
 
@@ -502,7 +508,7 @@ SELECTEDMEASURE()
 ```dax
 CALCULATE(
     SELECTEDMEASURE(),
-    SAMEPERIODLASTYEAR('Date'[FullDateAlternateKey])
+    SAMEPERIODLASTYEAR(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -522,7 +528,7 @@ CALCULATE(
 ```dax
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESMTD('Date'[FullDateAlternateKey])
+    DATESMTD(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -537,7 +543,7 @@ CALCULATE(
 ```dax
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESQTD('Date'[FullDateAlternateKey])
+    DATESQTD(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -552,7 +558,7 @@ CALCULATE(
 ```dax
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESYTD('Date'[FullDateAlternateKey])
+    DATESYTD(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -561,18 +567,19 @@ CALCULATE(
 
 ---
 
-### ขั้นตอนที่ 5: Save และ Refresh
+### ขั้นตอนที่ 5: Save และทดสอบ
 
-**Step 5.1:** ใน Tabular Editor:
-1. คลิก **Save** (หรือ Ctrl+S)
-2. กลับไปที่ Power BI Desktop
-3. Refresh Model (หรือรอให้ Auto-Refresh)
+**Step 5.1:** ใน Power BI Desktop:
+1. Calculation Item ที่สร้างใน Model view จะถูกใช้งานได้ทันที (ไม่ต้อง Save จาก External Tool)
+2. กลับไปที่ **Report view** เพื่อทดสอบ
 
 **Step 5.2:** ทดสอบ Calculation Group:
 - สร้าง Slicer จาก Calculation Group
 - สร้าง Visual ที่แสดง Measure
 - เลือก Calculation Item ใน Slicer
 - ตรวจสอบว่าผลลัพธ์ถูกต้อง
+
+> **Tip ของใหม่:** ใช้ **DAX Query View** ใน Power BI Desktop เพื่อทดสอบ Calculation Group ด้วย DAX Query ได้เร็วกว่าการสร้าง Visual (ดู [DAX query view - Microsoft Learn](https://learn.microsoft.com/power-bi/transform-model/dax-query-view))
 
 ---
 
@@ -598,8 +605,8 @@ CALCULATE(
 
 **Step 1.1:** ข้อมูลที่มี:
 
-- มีตาราง `CurrencyRate` ที่มี `AverageRate` และ `EndOfDayRate`
-- มี Relationship ระหว่าง `Date[DateKey]` และ `CurrencyRate[DateKey]`
+- มีตาราง `FactCurrencyRate` ที่มี `AverageRate` และ `EndOfDayRate`
+- มี Relationship ระหว่าง `DimDate[DateKey]` และ `FactCurrencyRate[DateKey]`
 
 **Step 1.2:** ความต้องการ:
 
@@ -610,11 +617,11 @@ CALCULATE(
 
 ### ขั้นตอนที่ 2: สร้าง Calculation Group
 
-**Step 2.1:** เปิด Tabular Editor
+**Step 2.1:** ใน **Model view** ของ Power BI Desktop กดปุ่ม **Calculation group** ใน ribbon (หรือสร้างผ่าน Tabular Editor เหมือนแบบฝึกหัดที่ 6)
 
 **Step 2.2:** สร้าง Calculation Group:
 - ชื่อ: `Conversion Rate`
-- ตั้ง Precedence: `1` (ทำงานก่อน Time Intelligence)
+- ตั้ง Precedence: `1` (ทำงานก่อน Time Intelligence) — ตั้งค่าได้จาก **Properties pane** เมื่อเลือก Calculation Group ใน Model view
 
 ---
 
@@ -645,8 +652,8 @@ SELECTEDMEASURE()
 ```dax
 VAR _rate =
     CALCULATE(
-        AVERAGE(CurrencyRate[AverageRate]),
-        CROSSFILTER('Date'[DateKey], CurrencyRate[DateKey], BOTH)
+        AVERAGE(FactCurrencyRate[AverageRate]),
+        CROSSFILTER(DimDate[DateKey], FactCurrencyRate[DateKey], BOTH)
     )
 RETURN
     SELECTEDMEASURE() * _rate
@@ -658,9 +665,9 @@ RETURN
 - `SELECTEDMEASURE() * _rate` คูณ Measure ด้วย Exchange Rate
 
 **เหตุผลใช้ CROSSFILTER():**
-- CurrencyRate table ไม่ได้เชื่อมโดยตรงกับ Fact Table
+- FactCurrencyRate table ไม่ได้เชื่อมโดยตรงกับ Fact Table
 - ต้องใช้ Date Dimension เป็นตัวเชื่อม
-- CROSSFILTER() ช่วยให้สามารถ Filter CurrencyRate จาก Date ใน Visual ได้
+- CROSSFILTER() ช่วยให้สามารถ Filter FactCurrencyRate จาก Date ใน Visual ได้
 
 ---
 
@@ -674,8 +681,8 @@ RETURN
 ```dax
 VAR _rate =
     CALCULATE(
-        AVERAGE(CurrencyRate[EndOfDayRate]),
-        CROSSFILTER('Date'[DateKey], CurrencyRate[DateKey], BOTH)
+        AVERAGE(FactCurrencyRate[EndOfDayRate]),
+        CROSSFILTER(DimDate[DateKey], FactCurrencyRate[DateKey], BOTH)
     )
 RETURN
     SELECTEDMEASURE() * _rate
@@ -702,7 +709,7 @@ RETURN
 ### คำถามเพื่อตรวจสอบความเข้าใจ
 
 1. **ทำไมต้องใช้ CROSSFILTER()?**
-   - **คำตอบ:** เพราะ CurrencyRate table ไม่ได้เชื่อมโดยตรงกับ Fact Table ต้องใช้ Date Dimension เป็นตัวเชื่อม, CROSSFILTER() ช่วยให้สามารถ Filter CurrencyRate จาก Date ใน Visual ได้
+   - **คำตอบ:** เพราะ FactCurrencyRate table ไม่ได้เชื่อมโดยตรงกับ Fact Table ต้องใช้ Date Dimension เป็นตัวเชื่อม, CROSSFILTER() ช่วยให้สามารถ Filter FactCurrencyRate จาก Date ใน Visual ได้
 
 2. **VAR ใช้ทำอะไร?**
    - **คำตอบ:** เก็บ Exchange Rate ในตัวแปรก่อนคูณกับ Measure

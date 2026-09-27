@@ -4,7 +4,7 @@
 
 โมดูลนี้แนะนำแนวคิดพื้นฐานของ Dimensional Model ซึ่งเป็นพื้นฐานสำคัญสำหรับการสร้าง Power BI Semantic Model โดยเรียนรู้การแยกแยะระหว่าง Measures และ Dimension Attributes, Star Schema และ Snowflake Schema, และแนวคิด Conformed Dimensions
 
-> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW**
+> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW2025**
 
 ---
 
@@ -142,7 +142,7 @@
 - เพราะ Fact Table อยู่ตรงกลาง (เหมือนดาว)
 - Dimension Tables อยู่รอบๆ (เหมือนรังสี)
 
-#### 3.2 ตัวอย่างจาก AdventureWorksDW
+#### 3.2 ตัวอย่างจาก AdventureWorksDW2025
 
 **Fact Table: FactResellerSales** (ตรงกลาง)
 ```
@@ -333,7 +333,7 @@ DimDate (Conformed Dimension)
 └── → FactSalesQuota (ผ่าน MonthKey)
 ```
 
-**ตัวอย่างจาก AdventureWorksDW:**
+**ตัวอย่างจาก AdventureWorksDW2025:**
 - **Date Dimension Table** จะถูกเชื่อมโยงกับทั้ง:
   - `FactResellerSales` Fact Table → ผ่านคอลัมน์ `OrderDateKey`
   - `FactInternetSales` Fact Table → ผ่านคอลัมน์ `OrderDateKey`
@@ -389,7 +389,7 @@ DimDate (Conformed Dimension)
 - **Yearly** (รายปี) = ข้อมูลในระดับปี
 - **Transaction** (รายการ) = ข้อมูลในระดับรายการ
 
-**ตัวอย่าง Granularity ใน AdventureWorksDW:**
+**ตัวอย่าง Granularity ใน AdventureWorksDW2025:**
 ```
 FactResellerSales:
 - Granularity: Daily (แต่ละ Row = 1 วัน, 1 Product, 1 Reseller)

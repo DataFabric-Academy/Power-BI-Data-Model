@@ -4,7 +4,7 @@
 
 โมดูลนี้เกี่ยวกับการเชื่อมต่อและจัดการแหล่งข้อมูลใน Power BI รวมถึงการเตรียมข้อมูลให้เหมาะสมกับการใช้งานใน Semantic Model
 
-> **Data Source หลักของหลักสูตรนี้:** หลักสูตรนี้ใช้ **AdventureWorksDW** เป็น Data Source หลักสำหรับตัวอย่างและแบบฝึกหัดทั้งหมด
+> **Data Source หลักของหลักสูตรนี้:** หลักสูตรนี้ใช้ **AdventureWorksDW2025** เป็น Data Source หลักสำหรับตัวอย่างและแบบฝึกหัดทั้งหมด
 
 ---
 
@@ -87,24 +87,24 @@
 5. Connect
 ```
 
-#### 2.2 AdventureWorksDW - Data Source หลัก ⭐
+#### 2.2 AdventureWorksDW2025 - Data Source หลัก ⭐
 
-**AdventureWorksDW** เป็น Data Warehouse ตัวอย่างจาก Microsoft ที่มีโครงสร้าง Star Schema ที่สมบูรณ์แบบสำหรับการเรียนรู้
+**AdventureWorksDW2025** เป็น Data Warehouse ตัวอย่างจาก Microsoft สำหรับ SQL Server 2025 ที่มีโครงสร้าง Star Schema ที่สมบูรณ์แบบสำหรับการเรียนรู้ (โครงสร้างตารางเหมือนกับ AdventureWorksDW2025 เวอร์ชันก่อนหน้า)
 
 ##### การเชื่อมต่อไปยัง Azure SQL Database
 
 **ข้อมูลการเชื่อมต่อ:**
 - **Server Name**: `ake.database.windows.net`
-- **Database Name**: `AdventureworksDW`
+- **Database Name**: `AdventureWorksDW2025`
 - **Authentication**: Database Authentication
-- **Login Name**: `student`
-- **Password**: `Pa55w.rd`
+- **Login Name**: `dwuser`
+- **Password**: `<password ที่ได้รับจากผู้สอน>`
 
 **ขั้นตอนการเชื่อมต่อ:**
 1. ใน Power BI Desktop เลือก **Get Data** > **Azure** > **Azure SQL Database**
 2. กรอกข้อมูลการเชื่อมต่อ:
    - Server: `ake.database.windows.net`
-   - Database: `AdventureworksDW`
+   - Database: `AdventureWorksDW2025`
 3. เลือก **Database Authentication**
 4. กรอก Login Name และ Password
 5. กด **Connect**
@@ -115,7 +115,7 @@
 
 ##### Fact Tables (ตารางข้อเท็จจริง)
 
-**Fact Tables ใน AdventureWorksDW:**
+**Fact Tables ใน AdventureWorksDW2025:**
 - **FactInternetSales** - การขายผ่าน Internet
 - **FactResellerSales** - การขายผ่าน Reseller  
 - **FactSalesQuota** - โควต้าขาย
@@ -128,7 +128,7 @@
 
 ##### Dimension Tables (ตารางมิติ)
 
-**Dimension Tables ใน AdventureWorksDW:**
+**Dimension Tables ใน AdventureWorksDW2025:**
 - **DimProduct** - สินค้า (Product Attributes)
 - **DimCustomer** - ลูกค้า (Customer Attributes)
 - **DimReseller** - ผู้จำหน่าย (Reseller Attributes)
@@ -144,19 +144,22 @@
 - มี Surrogate Key (ProductKey, CustomerKey)
 - มีจำนวน Rows น้อยกว่า Fact Tables
 
-##### วิธีการดาวน์โหลด AdventureWorksDW
+##### วิธีการดาวน์โหลดและติดตั้ง AdventureWorksDW2025
 
-**วิธีที่ 1: ดาวน์โหลดจาก GitHub**
-1. ไปที่ [Microsoft SQL Server Samples](https://github.com/Microsoft/sql-server-samples/releases/tag/adventureworks)
-2. ดาวน์โหลดไฟล์ `.bak`
+**วิธีที่ 1: ดาวน์โหลดไฟล์ `.bak` โดยตรง**
+1. ดาวน์โหลด [AdventureWorksDW2025.bak](https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorksDW2025.bak)
+2. Restore ฐานข้อมูลใน SQL Server หรือ Azure SQL Managed Instance ผ่าน SSMS
+3. ดูรายละเอียดทั้งหมดได้ที่ [AdventureWorks sample databases - Microsoft Learn](https://learn.microsoft.com/sql/samples/adventureworks-install-configure)
+
+**วิธีที่ 2: ดาวน์โหลดจาก GitHub Releases**
+1. ไปที่ [Microsoft SQL Server Samples Releases](https://github.com/Microsoft/sql-server-samples/releases/tag/adventureworks)
+2. เลือกไฟล์ `AdventureWorksDW2025.bak` (Data Warehouse version สำหรับ SQL Server 2025)
 3. Restore ฐานข้อมูลใน SQL Server
 
-**วิธีที่ 2: ใช้ Azure SQL Database**
-- ใช้ AdventureWorksDW ใน Azure SQL Database
-- เชื่อมต่อผ่าน Connection String
+**วิธีที่ 3: ใช้ Azure SQL Database ที่เตรียมให้**
+- เชื่อมต่อไปยัง `ake.database.windows.net` / `AdventureWorksDW2025` ตามข้อมูลการเชื่อมต่อด้านบน
 
-**วิธีที่ 3: ใช้ไฟล์ `.bak`**
-- Restore จากไฟล์ `.bak` ใน SQL Server
+> **หมายเหตุ:** AdventureWorksDW2025 มีโครงสร้างตาราง (Schema) เหมือนกับ AdventureWorksDW2025 เวอร์ชันก่อนหน้า ทั้ง Fact Tables (FactInternetSales, FactResellerSales, FactSalesQuota, FactCurrencyRate) และ Dimension Tables (DimProduct, DimCustomer, DimDate ฯลฯ) จึงใช้กับแบบฝึกหัดทุกโมดูลของหลักสูตรนี้ได้โดยตรง
 
 ---
 
@@ -281,6 +284,12 @@
 - ✅ ข้อมูลอยู่ใน **OneLake** (Lakehouse หรือ Data Warehouse)
 - ✅ ต้องการ **Performance สูง + ข้อมูล Real-time**
 - ✅ ข้อมูลขนาดใหญ่ (เกินขนาดที่ Import Mode รองรับ)
+
+**ของใหม่: Direct Lake ใน Power BI Desktop (GA ตั้งแต่กันยายน 2025) ⭐**
+- **Live edit** Direct Lake semantic model ได้จาก Power BI Desktop โดยตรง การแก้ไขถูก apply ไปที่ Fabric ทันที (Remote Modeling)
+- รวมตาราง **Direct Lake และ Import ไว้ใน semantic model เดียวกันได้** (ตั้งแต่พฤษภาคม 2025) — ยืดหยุ่นขึ้นสำหรับ Composite Models
+- ใช้ร่วมกับ TMDL View และ DAX Query View ใน Desktop ได้
+- ดูเพิ่มเติม: [Direct Lake in Power BI Desktop - Microsoft Learn](https://learn.microsoft.com/fabric/fundamentals/direct-lake-power-bi-desktop)
 
 **ข้อกำหนด:**
 1. **ต้องใช้ Microsoft Fabric** หรือ **Power BI Premium/PPU**

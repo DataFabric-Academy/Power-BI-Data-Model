@@ -4,7 +4,7 @@
 
 โมดูลนี้เกี่ยวกับการสร้างและใช้ Date Dimensions ซึ่งเป็น Dimension ที่สำคัญที่สุดใน Semantic Model และการใช้ Relationships กับ Date Tables โดยเฉพาะ Conformed Date Dimension Pattern
 
-> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW**
+> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW2025**
 
 ---
 
@@ -68,7 +68,9 @@
 - `HolidayName` - ชื่อของวันหยุด (ถ้ามี เช่น "New Year", "Christmas")
 - `IsWeekend` - วันหยุดสุดสัปดาห์ (TRUE/FALSE)
 
-**ตัวอย่างโครงสร้าง (AdventureWorksDW):**
+> **ของใหม่ (Preview): Enhanced DAX Time Intelligence** — นับจาก Power BI Desktop กันยายน 2025 สามารถนิยาม **Custom Calendar** (เช่น ปีงบประมาณ หรือปฏิทิน 4-5-4 ของค้าปลีก) สำหรับ Time Intelligence ได้โดยตรง พร้อมฟังก์ชันใหม่อย่าง `TOTALWTD`, `PREVIOUSWEEK` — ดู [Implement time-based calculations in Power BI - Microsoft Learn](https://learn.microsoft.com/power-bi/transform-model/desktop-time-intelligence) (ขณะนี้ยังเป็น Preview — ในคอร์สนี้เราใช้วิธีสร้าง DimDate แบบ Conformed Dimension ตามที่อธิบายด้านล่างเป็นหลัก)
+
+**ตัวอย่างโครงสร้าง (AdventureWorksDW2025):**
 ```
 DimDate
 ├── DateKey (Surrogate Key)
@@ -163,7 +165,7 @@ DimDate
 - **Multiple Date Relationships** - สร้าง Relationships หลายตัวผ่าน Date Keys ที่แตกต่างกัน
 - **Role-Playing Pattern** - ใช้ DimDate เดียวในบทบาทต่างๆ (Order Date, Ship Date, Due Date)
 
-**ตัวอย่าง (AdventureWorksDW):**
+**ตัวอย่าง (AdventureWorksDW2025):**
 - `DimDate` → Conformed Dimension (ตารางเดียว)
 - `FactInternetSales` → เชื่อมผ่าน OrderDateKey, ShipDateKey, DueDateKey
 - `FactResellerSales` → เชื่อมผ่าน OrderDateKey, ShipDateKey, DueDateKey
@@ -174,7 +176,9 @@ DimDate
 - ✅ ง่ายต่อการบำรุงรักษา - อัพเดท DimDate เดียว
 - ✅ สามารถดู Measures จากหลาย Fact Tables ร่วมกันได้ - ใช้ DimDate ร่วมกัน
 
-**👉 ดูตัวอย่างที่สมบูรณ์:** `Data Model Conformed Date Dimension.SemanticModel`
+**👉 ดูตัวอย่างที่สมบูรณ์:** `Data Model Conformed Date Dimension.pbix`
+
+> **หมายเหตุ:** ไฟล์ตัวอย่างเป็นสื่อการสอนของผู้สอน (Trainer Material) — ขอไฟล์ได้จากผู้สอนระหว่างเรียน ไม่ได้แจกจ่ายผ่าน repository นี้
 
 #### 3.2 Role-Playing Dimensions กับ Multiple Date Relationships
 
@@ -634,7 +638,7 @@ Revenue = [Internet Sale Revenue] + [Reseller Sale Revenue]
 
 **ในตาราง FactInternetSales:**
 ```dax
-Shiped Internet Sales Revenue = 
+Shipped Internet Sales Revenue = 
 CALCULATE(
     [Internet Sale Revenue],
     USERELATIONSHIP(DimDate[DateKey], FactInternetSales[ShipDateKey])
@@ -649,7 +653,7 @@ CALCULATE(
 
 **ในตาราง FactResellerSales:**
 ```dax
-Shiped Reseller Sales Revenue = 
+Shipped Reseller Sales Revenue = 
 CALCULATE(
     [Reseller Sale Revenue],
     USERELATIONSHIP(DimDate[DateKey], FactResellerSales[ShipDateKey])
@@ -664,8 +668,8 @@ CALCULATE(
 
 **ในตาราง All Measures:**
 ```dax
-Shiped Revenue = 
-[Shiped Internet Sales Revenue] + [Shiped Reseller Sales Revenue]
+Shipped Revenue = 
+[Shipped Internet Sales Revenue] + [Shipped Reseller Sales Revenue]
 
 Due Revenue = 
 [Due Internet Sales Revenue] + [Due Reseller Sales Revenue]
@@ -724,7 +728,7 @@ Due Revenue =
 
 ### ไฟล์ตัวอย่างที่แนะนำ
 
-**หมายเหตุ:** ตัวอย่างในโมดูลนี้ใช้ AdventureWorksDW เป็น Data Source
+**หมายเหตุ:** ตัวอย่างในโมดูลนี้ใช้ AdventureWorksDW2025 เป็น Data Source
 
 ---
 

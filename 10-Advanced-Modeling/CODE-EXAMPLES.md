@@ -7,8 +7,9 @@
 > **หมายเหตุ:** ตัวอย่างโค้ดสำหรับ Calculation Groups ได้ย้ายไปอยู่ใน **08-Fact-Tables-Design/CODE-EXAMPLES.md** แล้ว
 
 > **ไฟล์ตัวอย่าง:**
-> - `Data Model Conformed Date Dimension.SemanticModel`
-> - `AdventureWorksDW` - ตัวอย่าง FactSalesQuota และ FactResellerSales
+> - `Data Model Conformed Date Dimension.pbix`
+> - `AdventureWorksDW2025` - ตัวอย่าง FactSalesQuota และ FactResellerSales
+> **หมายเหตุ:** ไฟล์ตัวอย่างเป็นสื่อการสอนของผู้สอน (Trainer Material) — ขอไฟล์ได้จากผู้สอนระหว่างเรียน ไม่ได้แจกจ่ายผ่าน repository นี้
 
 ---
 
@@ -296,7 +297,7 @@ Current = SELECTEDMEASURE()
 LY = 
 CALCULATE(
     SELECTEDMEASURE(),
-    SAMEPERIODLASTYEAR('Date'[FullDateAlternateKey])
+    SAMEPERIODLASTYEAR(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -312,7 +313,7 @@ CALCULATE(
 MTD = 
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESMTD('Date'[FullDateAlternateKey])
+    DATESMTD(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -328,7 +329,7 @@ CALCULATE(
 QTD = 
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESQTD('Date'[FullDateAlternateKey])
+    DATESQTD(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -344,7 +345,7 @@ CALCULATE(
 YTD = 
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESYTD('Date'[FullDateAlternateKey])
+    DATESYTD(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -375,8 +376,8 @@ Calculation Group: "Conversion Rate" (precedence: 1)
 ```dax
 AVG Rate = 
 VAR xrate = CALCULATE(
-    AVERAGE('Currency Rate'[AverageRate]),
-    CROSSFILTER('Date'[DateKey], 'Currency Rate'[DateKey], Both)
+    AVERAGE(FactFactCurrencyRate[AverageRate]),
+    CROSSFILTER(DimDate[DateKey], FactFactCurrencyRate[DateKey], Both)
 )
 RETURN 
     SELECTEDMEASURE() * xrate
@@ -394,8 +395,8 @@ RETURN
 ```dax
 EOD Rate = 
 VAR xrate = CALCULATE(
-    AVERAGE('Currency Rate'[EndOfDayRate]),
-    CROSSFILTER('Date'[DateKey], 'Currency Rate'[DateKey], Both)
+    AVERAGE(FactFactCurrencyRate[EndOfDayRate]),
+    CROSSFILTER(DimDate[DateKey], FactFactCurrencyRate[DateKey], Both)
 )
 RETURN 
     SELECTEDMEASURE() * xrate
@@ -447,7 +448,7 @@ Current = SELECTEDMEASURE()
 LY = 
 CALCULATE(
     SELECTEDMEASURE(),
-    SAMEPERIODLASTYEAR('Date'[FullDateAlternateKey])
+    SAMEPERIODLASTYEAR(DimDate[FullDateAlternateKey])
 )
 ```
 

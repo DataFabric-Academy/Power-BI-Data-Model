@@ -6,7 +6,7 @@
 
 > **หมายเหตุ:** สำหรับการวิเคราะห์และ Optimize Performance ให้ดูที่ **08-Performance-Optimization**
 
-> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW**
+> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW2025**
 
 ---
 
@@ -350,7 +350,7 @@ Foreign Keys ใน Fact Tables ควรซ่อนเพราะใช้เ
 ```
 Table: FactResellerSales
 Description: Fact table containing reseller sales transactions. 
-Source: AdventureWorksDW database.
+Source: AdventureWorksDW2025 database.
 Last Updated: 2024-01-15
 ```
 

@@ -373,7 +373,9 @@ RETURN
 3. สร้าง Slicer จาก 'Measure Selector'[Measure Name]
 4. แสดง Measure to Show ใน Visual
 
-**👉 ดูตัวอย่างที่สมบูรณ์:** `Data Model - SELECTEDVALUE.SemanticModel`
+**👉 ดูตัวอย่างที่สมบูรณ์:** `Data Model Time Intelligence without Calculation Group.pbix`
+
+> **หมายเหตุ:** ไฟล์ตัวอย่างเป็นสื่อการสอนของผู้สอน (Trainer Material) — ขอไฟล์ได้จากผู้สอนระหว่างเรียน ไม่ได้แจกจ่ายผ่าน repository นี้
 
 ---
 
@@ -475,7 +477,7 @@ DIVIDE(
 
 - ตัวอย่างทั้งหมดใช้ชื่อตารางและคอลัมน์แบบ Generic
 - คุณต้องปรับแต่งให้ตรงกับ Model ของคุณ
-- ตัวอย่างทั้งหมดใช้ **AdventureWorksDW** เป็น Data Source
+- ตัวอย่างทั้งหมดใช้ **AdventureWorksDW2025** เป็น Data Source
 
 ---
 

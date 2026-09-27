@@ -2,9 +2,9 @@
 
 ## 📚 เนื้อหาหลักสูตร
 
-โมดูลนี้เป็นกรณีศึกษาจากโครงการจริง โดยใช้ฐานข้อมูล **AdventureWorksDW** เป็นตัวอย่าง เพื่อให้นักเรียนได้เรียนรู้วิธีการนำความรู้ทั้งหมดที่เรียนมาไปประยุกต์ใช้ในสถานการณ์จริง พร้อมทั้งเรียนรู้วิธีแก้ปัญหาและการทำ Best Practices
+โมดูลนี้เป็นกรณีศึกษาจากโครงการจริง โดยใช้ฐานข้อมูล **AdventureWorksDW2025** เป็นตัวอย่าง เพื่อให้นักเรียนได้เรียนรู้วิธีการนำความรู้ทั้งหมดที่เรียนมาไปประยุกต์ใช้ในสถานการณ์จริง พร้อมทั้งเรียนรู้วิธีแก้ปัญหาและการทำ Best Practices
 
-> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW** จาก Microsoft
+> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW2025** จาก Microsoft
 > 
 > **แหล่งข้อมูลอ้างอิง:**
 > - [Microsoft SQL Server Samples - AdventureWorks](https://github.com/Microsoft/sql-server-samples/releases/tag/adventureworks)
@@ -24,7 +24,7 @@
 
 บริษัท AdventureWorks ซึ่งเป็นบริษัทจำหน่ายจักรยานและอุปกรณ์จักรยาน ต้องการสร้าง Report เพื่อวิเคราะห์ยอดขาย และต้องการดูยอดขายแยกตาม Product, Customer, Date และต้องการดู Time Intelligence เช่น Year-to-Date (YTD), Quarter-to-Date (QTD), Month-to-Date (MTD), และ Last Year (LY)
 
-**ข้อมูลที่มีใน AdventureWorksDW:**
+**ข้อมูลที่มีใน AdventureWorksDW2025:**
 - **FactResellerSales** (Fact Table) - ข้อมูลการขายผ่าน Reseller มี Measures เช่น SalesAmount, OrderQuantity และ Foreign Keys ต่างๆ
 - **DimProduct** (Dimension Table) - ข้อมูลสินค้า เช่น ProductName, ProductCategoryName, ProductSubcategoryName
 - **DimCustomer** (Dimension Table) - ข้อมูลลูกค้า เช่น CustomerName, GeographyKey
@@ -135,7 +135,7 @@ RETURN
 
 บริษัท AdventureWorks ต้องการวิเคราะห์ Performance ของสินค้า และต้องการดูยอดขายแยกตาม Product Category และ Subcategory รวมถึงต้องการเปรียบเทียบ Sales กับ Quota เพื่อดูว่าสินค้าชนิดไหนบรรลุเป้าหมายหรือไม่
 
-**ข้อมูลที่มีใน AdventureWorksDW:**
+**ข้อมูลที่มีใน AdventureWorksDW2025:**
 - **FactResellerSales** (Fact Table) - ข้อมูลการขายผ่าน Reseller มี Daily Granularity (ขายแต่ละวัน)
 - **FactSalesQuota** (Fact Table) - ข้อมูลโควต้าขาย มี Monthly Granularity (โควต้าต่อเดือน)
 - **DimProduct** (Dimension Table) - ข้อมูลสินค้า เช่น ProductCategoryName, ProductSubcategoryName
@@ -223,7 +223,7 @@ CALCULATE(
 
 บริษัท AdventureWorks ต้องการแบ่งกลุ่มลูกค้าตามยอดซื้อ (Customer Segmentation) เพื่อทำการตลาดแบบเฉพาะเจาะจง (Targeted Marketing) โดยแบ่งเป็น 3 ระดับ คือ Platinum (ยอดซื้อมาก), Gold (ยอดซื้อปานกลาง), และ Silver (ยอดซื้อน้อย)
 
-**ข้อมูลที่มีใน AdventureWorksDW:**
+**ข้อมูลที่มีใน AdventureWorksDW2025:**
 - **FactResellerSales** (Fact Table) - ข้อมูลการขายผ่าน Reseller มี SalesAmount
 - **DimCustomer** (Dimension Table) - ข้อมูลลูกค้า เช่น CustomerKey, CustomerName
 
@@ -319,7 +319,7 @@ RETURN
 
 บริษัท AdventureWorks ต้องการสร้าง Organization Hierarchy จาก Employee Table เพื่อดูโครงสร้างองค์กร และต้องการดู Sales by Organization Level เช่น Sales by CEO, VP, Manager, Employee
 
-**ข้อมูลที่มีใน AdventureWorksDW:**
+**ข้อมูลที่มีใน AdventureWorksDW2025:**
 - **DimEmployee** (Dimension Table) - ข้อมูลพนักงาน เช่น EmployeeKey, ManagerID, FirstName, LastName, Title
 
 **โครงสร้างข้อมูล:**
@@ -409,7 +409,7 @@ CALCULATE(
 
 บริษัท AdventureWorks ต้องการวิเคราะห์ตะกร้าสินค้า (Basket Analysis) เพื่อดูว่าสินค้าชนิดไหนที่ลูกค้ามักซื้อร่วมกัน ซึ่งจะช่วยในการทำ Cross-Selling และ Product Recommendations
 
-**ข้อมูลที่มีใน AdventureWorksDW:**
+**ข้อมูลที่มีใน AdventureWorksDW2025:**
 - **FactResellerSales** (Fact Table) - ข้อมูลการขายผ่าน Reseller
 - **DimProduct** (Dimension Table) - ข้อมูลสินค้า
 - **DimCustomer** (Dimension Table) - ข้อมูลลูกค้า
@@ -569,7 +569,7 @@ RETURN
 
 ### โมดูลที่เกี่ยวข้อง
 - [README.md](../README.md) - โครงสร้างหลักสูตร
-- **02-Data-Sources** - การเชื่อมต่อ AdventureWorksDW
+- **02-Data-Sources** - การเชื่อมต่อ AdventureWorksDW2025
 - **03-Data-Modeling-Basics** - Star Schema และ Dimensional Model
 - **04-Relationships** - Relationships และ DAX Functions
 - **05-Dimension-Table-Design** - Parent-Child Hierarchy
@@ -579,7 +579,7 @@ RETURN
 - **09-Best-Practices** - Best Practices
 
 ### แหล่งข้อมูลอ้างอิง
-- [Microsoft SQL Server Samples - AdventureWorks](https://github.com/Microsoft/sql-server-samples/releases/tag/adventureworks) - ดาวน์โหลด AdventureWorksDW
+- [Microsoft SQL Server Samples - AdventureWorks](https://github.com/Microsoft/sql-server-samples/releases/tag/adventureworks) - ดาวน์โหลด AdventureWorksDW2025
 - [SQLBI.com - SQLBI Methodology at Work](https://www.sqlbi.com/blog/marco/2008/10/02/sqlbi-methodology-at-work/) - SQLBI Methodology
 - [SQLBI.com - Data Import Best Practices in Power BI](https://www.sqlbi.com/articles/data-import-best-practices-in-power-bi/) - Best Practices สำหรับ Import ข้อมูล
 - [SQLBI.com - The Many-to-Many Revolution 2.0](https://www.sqlbi.com/wp-content/uploads/The_Many-to-Many_Revolution_2.0.pdf) - Many-to-Many Relationships และ Basket Analysis

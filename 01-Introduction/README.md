@@ -4,7 +4,7 @@
 
 โมดูลนี้แนะนำแนวคิดพื้นฐานเกี่ยวกับ Power BI Semantic Model และปูพื้นฐานความเข้าใจเกี่ยวกับ VertiPaq Engine ซึ่งเป็น Storage Engine ที่ Power BI ใช้ในการจัดเก็บและประมวลผลข้อมูลใน Semantic Model
 
-> **Data Source หลักของหลักสูตร:** หลักสูตรนี้ใช้ **AdventureWorksDW** เป็น Data Source หลักสำหรับตัวอย่างและแบบฝึกหัดทั้งหมด
+> **Data Source หลักของหลักสูตร:** หลักสูตรนี้ใช้ **AdventureWorksDW2025** เป็น Data Source หลักสำหรับตัวอย่างและแบบฝึกหัดทั้งหมด
 
 ---
 
@@ -444,22 +444,28 @@ RETURN
 
 ### Part 3: External Tools สำหรับจัดการ Semantic Model ⭐
 
-#### 1. Power BI Desktop Views
+#### 1. Power BI Desktop Views ⭐ (ของใหม่ - GA ทั้งหมด)
+
+> **ของใหม่ 2024–2025:** งานจำนวนมากที่เคยต้องใช้ External Tool ตอนนี้ทำได้ใน Power BI Desktop โดยตรง — โฟกัสการสอนคอร์สนี้ที่ Power BI Desktop เป็นหลัก และใช้ External Tools เป็นเครื่องมือเสริม
 
 ##### Model View
 - จัดการ Semantic Model
 - ดูและแก้ไข Relationships
 - ตั้งค่า Properties ของ Tables และ Columns
+- **สร้าง Calculation Group ได้โดยตรง** จากปุ่ม **Calculation group** ใน ribbon (GA) — ไม่ต้องใช้ Tabular Editor
 
 ##### DAX Query View
-- เขียนและทดสอบ DAX Queries
-- วิเคราะห์ผลลัพธ์ของ Query
-- Debugging DAX Code
+- เขียนและทดสอบ DAX Queries (EVALUATE) ใน Desktop ได้เลย (GA)
+- Quick Queries: สร้าง query จาก measure/table ที่เลือกอัตโนมัติ
+- ใช้ CodeLens "update model" เพื่อเพิ่ม measure จาก query กลับเข้าโมเดลได้
+- Debugging DAX Code ก่อนนำไปใช้จริง
+- ดูเพิ่มเติม: [DAX query view - Microsoft Learn](https://learn.microsoft.com/power-bi/transform-model/dax-query-view)
 
 ##### TMDL View
-- จัดการ Model ผ่าน Tabular Model Definition Language
-- แก้ไข Metadata ผ่าน Text Editor
-- เหมาะสำหรับ Advanced Users
+- จัดการ Model ผ่าน Tabular Model Definition Language (GA ใน Power BI Desktop ตั้งแต่กันยายน 2025)
+- Script → แก้ไข → กด Apply เพื่ออัปเดตโมเดล เหมาะกับ bulk edit และ reuse script
+- แก้ไข Properties ที่ไม่มีใน UI เช่น `IsAvailableInMDX` ได้โดยตรง
+- ดูเพิ่มเติม: [Work with TMDL view - Microsoft Learn](https://learn.microsoft.com/power-bi/transform-model/desktop-tmdl-view)
 
 #### 2. DAX Studio ⭐ **แนะนำตั้งแต่ต้น**
 
@@ -482,17 +488,18 @@ RETURN
 
 **👉 แนะนำให้ใช้ VertiPaq Analyzer ตั้งแต่ต้น** เพื่อให้เห็นภาพชัดเจนว่า VertiPaq ทำงานอย่างไรกับข้อมูลจริง
 
-#### 3. Tabular Editor ⭐ **แนะนำตั้งแต่ต้น**
+#### 3. Tabular Editor (เครื่องมือเสริม)
+
+> **อัปเดต:** งานหลักอย่าง Calculation Groups และ IsAvailableInMDX ทำได้ใน Power BI Desktop แล้ว (Model view / TMDL View) Tabular Editor จึงเป็น**เครื่องมือเสริม**สำหรับงานระดับสูง
 
 **Tabular Editor** เป็นเครื่องมือที่ช่วยให้การจัดการ Semantic Model เร็วขึ้นมาก:
 
-**ข้อดี:**
-- จัดการ Metadata ได้เร็วกว่า Power BI Desktop
-- ตั้งค่า Properties ที่ซับซ้อนได้ง่าย
-- สร้างและแก้ไข Measures/Columns จำนวนมากได้เร็ว
-- จัดการ Calculation Groups ได้สะดวก
+**ใช้เมื่อไหร่:**
+- สร้าง/แก้ไข Measures หรือ Columns จำนวนมากพร้อมกัน (batch edit)
+- ตั้งค่า Properties ที่ซับซ้อน
 - Export/Import Metadata
 - รองรับ Scripting (C#) สำหรับ Automation
+- ใช้ Best Practice Analyzer (BPA) ร่วมกับ ALM Toolkit
 
 **ประเภท:**
 - **Tabular Editor 2 (Open Source)**: ฟรี, มีข้อจำกัดบางอย่าง
@@ -502,14 +509,6 @@ RETURN
 1. ใน Power BI Desktop ไปที่ **External Tools** > **Tabular Editor**
 2. หรือเปิด Tabular Editor แยก แล้วเชื่อมต่อกับ Power BI Desktop
 3. จะเห็นโครงสร้าง Semantic Model ทั้งหมดใน TOM Explorer
-
-**👉 แนะนำให้ใช้ Tabular Editor ตั้งแต่ต้น** เพื่อให้เห็นว่าสามารถทำงานกับ Model ได้เร็วขึ้นอย่างไร
-
-**ตัวอย่างการใช้ Tabular Editor:**
-- ตั้งค่า Properties หลายคอลัมน์พร้อมกัน
-- สร้าง Measures จำนวนมากได้เร็ว
-- จัดการ Calculation Groups
-- Export/Import Metadata สำหรับ Version Control
 
 #### 4. เครื่องมืออื่นๆ
 

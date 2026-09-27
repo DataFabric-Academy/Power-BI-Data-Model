@@ -4,7 +4,8 @@
 
 ไฟล์นี้รวบรวมแบบฝึกหัดแบบ Step-by-Step สำหรับการออกแบบ Dimension Table โดยเฉพาะ SCD Type 2 และ Attribute Hierarchies โดยรวม Code Examples และคำอธิบายที่ละเอียด
 
-> **ไฟล์ตัวอย่าง:** `Data Model SCD.SemanticModel` และ `Data Model SCD.Report`
+> **ไฟล์ตัวอย่าง:** `Data Model SCD.pbix`
+> **หมายเหตุ:** ไฟล์ตัวอย่างเป็นสื่อการสอนของผู้สอน (Trainer Material) — ขอไฟล์ได้จากผู้สอนระหว่างเรียน ไม่ได้แจกจ่ายผ่าน repository นี้
 
 ---
 
@@ -20,7 +21,7 @@
 
 **Step 1.1:** เปิด Power BI Desktop
 
-**Step 1.2:** เปิดไฟล์ `Data Model SCD.SemanticModel`
+**Step 1.2:** เปิดไฟล์ `Data Model SCD.pbix`
 
 **Step 1.3:** ไปที่ **Data View** หรือ **Model View**
 
@@ -617,7 +618,7 @@ CALCULATE(
 
 ### ขั้นตอนที่ 1: ตรวจสอบโครงสร้างตาราง Employee
 
-**Step 1.1:** เปิด AdventureWorksDW
+**Step 1.1:** เปิด AdventureWorksDW2025
 
 **Step 1.2:** ตรวจสอบตาราง `DimEmployee`:
 

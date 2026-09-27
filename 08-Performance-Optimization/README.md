@@ -6,7 +6,7 @@
 
 > **หมายเหตุ:** ส่วนใหญ่สามารถทำได้ใน **Power BI Desktop** แต่ Semantic Model Metrics และการ Monitor Performance แบบ Real-time ต้องใช้ **Power BI Service**
 
-> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW**
+> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW2025**
 
 ---
 

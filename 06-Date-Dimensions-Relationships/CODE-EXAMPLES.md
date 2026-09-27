@@ -5,7 +5,8 @@
 ไฟล์นี้รวบรวมตัวอย่างโค้ด DAX สำหรับ Date Dimensions และ Relationships จากไฟล์ตัวอย่าง
 
 > **ไฟล์ตัวอย่าง:**
-> - `Data Model Conformed Date Dimension.SemanticModel`
+> - `Data Model Conformed Date Dimension.pbix`
+> **หมายเหตุ:** ไฟล์ตัวอย่างเป็นสื่อการสอนของผู้สอน (Trainer Material) — ขอไฟล์ได้จากผู้สอนระหว่างเรียน ไม่ได้แจกจ่ายผ่าน repository นี้
 
 ---
 
@@ -53,7 +54,7 @@ DimDate (Conformed Dimension)
 Ordered Internet Sale Revenue = SUM(FactInternetSales[SalesAmount])
 
 // FactResellerSales
-Orderd Reseller Sale Revenue = SUM(FactResellerSales[SalesAmount])
+Ordered Reseller Sale Revenue = SUM(FactResellerSales[SalesAmount])
 ```
 
 **อธิบาย:**
@@ -68,16 +69,16 @@ Orderd Reseller Sale Revenue = SUM(FactResellerSales[SalesAmount])
 
 ```dax
 // FactInternetSales - Ship Date
-Shiped Internet Sales Revenue = 
+Shipped Internet Sales Revenue = 
 CALCULATE(
     [Ordered Internet Sale Revenue],
     USERELATIONSHIP(DimDate[DateKey], FactInternetSales[ShipDateKey])
 )
 
 // FactResellerSales - Ship Date
-Shiped Reseller Sales Revenue = 
+Shipped Reseller Sales Revenue = 
 CALCULATE(
-    [Orderd Reseller Sale Revenue],
+    [Ordered Reseller Sale Revenue],
     USERELATIONSHIP(DimDate[DateKey], FactResellerSales[ShipDateKey])
 )
 ```
@@ -103,7 +104,7 @@ CALCULATE(
 // FactResellerSales - Due Date
 Due Reseller Sales Revenue = 
 CALCULATE(
-    [Orderd Reseller Sale Revenue],
+    [Ordered Reseller Sale Revenue],
     USERELATIONSHIP(DimDate[DateKey], FactResellerSales[DueDateKey])
 )
 ```
@@ -228,7 +229,7 @@ CALCULATE(
 
 ```dax
 Ordered Revenue = 
-[Ordered Internet Sale Revenue] + [Orderd Reseller Sale Revenue]
+[Ordered Internet Sale Revenue] + [Ordered Reseller Sale Revenue]
 ```
 
 **อธิบาย:**
@@ -241,8 +242,8 @@ Ordered Revenue =
 **รวม Ship Date Revenue:**
 
 ```dax
-Shiped Revenue = 
-[Shiped Internet Sales Revenue] + [Shiped Reseller Sales Revenue]
+Shipped Revenue = 
+[Shipped Internet Sales Revenue] + [Shipped Reseller Sales Revenue]
 ```
 
 **อธิบาย:**
@@ -320,7 +321,7 @@ Revenue = [Internet Sale Revenue] + [Reseller Sale Revenue]
 
 **ในตาราง FactInternetSales:**
 ```dax
-Shiped Internet Sales Revenue = 
+Shipped Internet Sales Revenue = 
 CALCULATE(
     [Internet Sale Revenue],
     USERELATIONSHIP(DimDate[DateKey], FactInternetSales[ShipDateKey])
@@ -335,7 +336,7 @@ CALCULATE(
 
 **ในตาราง FactResellerSales:**
 ```dax
-Shiped Reseller Sales Revenue = 
+Shipped Reseller Sales Revenue = 
 CALCULATE(
     [Reseller Sale Revenue],
     USERELATIONSHIP(DimDate[DateKey], FactResellerSales[ShipDateKey])
@@ -350,8 +351,8 @@ CALCULATE(
 
 **ในตาราง All Measures:**
 ```dax
-Shiped Revenue = 
-[Shiped Internet Sales Revenue] + [Shiped Reseller Sales Revenue]
+Shipped Revenue = 
+[Shipped Internet Sales Revenue] + [Shipped Reseller Sales Revenue]
 
 Due Revenue = 
 [Due Internet Sales Revenue] + [Due Reseller Sales Revenue]

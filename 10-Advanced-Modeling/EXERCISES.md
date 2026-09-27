@@ -7,8 +7,9 @@
 > **หมายเหตุ:** แบบฝึกหัดสำหรับ Calculation Groups ได้ย้ายไปอยู่ใน **07-Fact-Tables-Design/EXERCISES.md** แล้ว
 
 > **ไฟล์ตัวอย่าง:**
-> - `Data Model Conformed Date Dimension.SemanticModel`
-> - `AdventureWorksDW` - ตัวอย่าง FactSalesQuota และ FactResellerSales
+> - `Data Model Conformed Date Dimension.pbix`
+> - `AdventureWorksDW2025` - ตัวอย่าง FactSalesQuota และ FactResellerSales
+> **หมายเหตุ:** ไฟล์ตัวอย่างเป็นสื่อการสอนของผู้สอน (Trainer Material) — ขอไฟล์ได้จากผู้สอนระหว่างเรียน ไม่ได้แจกจ่ายผ่าน repository นี้
 
 ---
 

@@ -46,7 +46,7 @@
 - ✅ Data Modeling Basics (โมดูล 03)
 - ✅ VertiPaq Engine (โมดูล 01) - แนะนำให้เรียนก่อน
 
-> **หมายเหตุ**: หลักสูตรนี้ใช้ **AdventureWorksDW** เป็น Data Source หลัก ตารางหลักที่ใช้:
+> **หมายเหตุ**: หลักสูตรนี้ใช้ **AdventureWorksDW2025** เป็น Data Source หลัก ตารางหลักที่ใช้:
 > - Fact Tables: `FactInternetSales`, `FactResellerSales`
 > - Dimension Tables: `DimProduct`, `DimDate`, `DimCustomer`, `DimReseller`, `DimGeography`, `DimEmployee`, `DimPromotion`
 
@@ -602,7 +602,7 @@ RELATED(<column>)
 - ใช้ใน **Row Context** เท่านั้น
 - ใช้กับ Calculated Columns หรือใน Iterator Functions
 
-**ตัวอย่างที่ 1: ดึงข้อมูลชื่อสินค้าจาก Dimension Table (AdventureWorksDW)**
+**ตัวอย่างที่ 1: ดึงข้อมูลชื่อสินค้าจาก Dimension Table (AdventureWorksDW2025)**
 
 **สถานการณ์:** 
 - มีตาราง `FactResellerSales` (Fact Table) ที่มี `ProductKey`
@@ -636,7 +636,7 @@ RELATEDTABLE(<table>)
 - คืนค่าเป็น Table
 - ใช้ใน Row Context หรือใน CALCULATE()
 
-**ตัวอย่างที่ 1: นับจำนวนการขายของแต่ละสินค้า (AdventureWorksDW)**
+**ตัวอย่างที่ 1: นับจำนวนการขายของแต่ละสินค้า (AdventureWorksDW2025)**
 
 **สถานการณ์:**
 - ตาราง `DimProduct` (One)
@@ -702,7 +702,7 @@ CALCULATE(<expression>, <filter1>, <filter2>, ...)
 - ใช้เพื่อควบคุม Filter Context
 - สามารถ Filter ผ่าน Relationships ได้
 
-**ตัวอย่างที่ 1: Filter ผ่าน Relationship (AdventureWorksDW)**
+**ตัวอย่างที่ 1: Filter ผ่าน Relationship (AdventureWorksDW2025)**
 
 **สถานการณ์:**
 - มีตาราง `FactResellerSales` และ `DimProduct`
@@ -792,7 +792,7 @@ CALCULATE(
 4. **ยกเลิก** Active checkbox
 5. Relationship จะกลายเป็น Inactive
 
-### 📝 ตัวอย่าง: Role-Playing Dimensions (AdventureWorksDW)
+### 📝 ตัวอย่าง: Role-Playing Dimensions (AdventureWorksDW2025)
 
 **สถานการณ์:**
 - ตาราง `FactResellerSales` มี `OrderDateKey`, `ShipDateKey`, และ `DueDateKey`
@@ -853,7 +853,7 @@ CALCULATE(
 - `ONEWAY` - Filter ทิศทางเดียว (Many → One)
 - `NONE` - ไม่มี Filter
 
-### 📝 ตัวอย่างการใช้งาน (AdventureWorksDW)
+### 📝 ตัวอย่างการใช้งาน (AdventureWorksDW2025)
 
 **สถานการณ์:**
 - Relationship: FactResellerSales[ProductKey] → DimProduct[ProductKey] (Single Direction)
@@ -954,7 +954,7 @@ TREATAS(<table>, <column1>[, <column2>, ...])
 - สร้าง Virtual Relationship โดยไม่ต้องสร้าง Relationship จริง
 - ใช้เมื่อต้องการเชื่อมความสัมพันธ์ชั่วคราว
 
-**ตัวอย่าง (AdventureWorksDW):**
+**ตัวอย่าง (AdventureWorksDW2025):**
 
 ต้องการหาจำนวนพนักงานที่จ้างในแต่ละปี แต่ไม่ต้องการสร้าง Relationship ระหว่าง DimDate และ DimEmployee
 
@@ -1103,6 +1103,6 @@ CALCULATE(
 **🎉 ขอแสดงความยินดี! คุณได้เรียนจบโมดูล Relationships แล้ว (ทั้ง Part 1 และ Part 2)!**
 
 **ขั้นตอนต่อไป:** 
-- ฝึกปฏิบัติด้วยไฟล์ตัวอย่างจาก AdventureWorksDW
+- ฝึกปฏิบัติด้วยไฟล์ตัวอย่างจาก AdventureWorksDW2025
 - เรียนโมดูล 05-Dimension-Table-Design
 - เรียนโมดูล 06-Date-Dimensions-Relationships

@@ -6,7 +6,7 @@
 
 > **หมายเหตุ:** เนื้อหาเกี่ยวกับ Explicit Measures และ Calculation Groups ได้ย้ายไปอยู่ใน **08-Fact-Tables-Design** แล้ว
 
-> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW**
+> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW2025**
 
 ---
 
@@ -23,7 +23,7 @@
 - ไม่สามารถดู Measures จาก Fact Tables ต่างกันร่วมกันได้โดยตรง
 - ต้องหาวิธีควบคุม Granularity เพื่อให้สามารถเปรียบเทียบข้อมูลได้
 
-**ตัวอย่างจาก AdventureWorksDW:**
+**ตัวอย่างจาก AdventureWorksDW2025:**
 
 **FactSalesQuota:**
 - **Granularity**: ระดับ Month/Quarter/Year
@@ -325,7 +325,7 @@ Reseller Sales Revenue = SUM(FactResellerSales[SalesAmount])
 
 ### ไฟล์ตัวอย่างที่แนะนำ
 
-**หมายเหตุ:** ตัวอย่างในโมดูลนี้ใช้ AdventureWorksDW เป็น Data Source โดยเฉพาะ FactSalesQuota และ FactResellerSales สำหรับ Heterogeneous Granularity
+**หมายเหตุ:** ตัวอย่างในโมดูลนี้ใช้ AdventureWorksDW2025 เป็น Data Source โดยเฉพาะ FactSalesQuota และ FactResellerSales สำหรับ Heterogeneous Granularity
 
 ---
 

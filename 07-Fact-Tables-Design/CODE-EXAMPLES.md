@@ -4,7 +4,7 @@
 
 ไฟล์นี้รวบรวมตัวอย่างโค้ด DAX สำหรับ Explicit Measures และ Calculation Groups
 
-> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW**
+> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW2025**
 
 ---
 
@@ -190,7 +190,7 @@ Current = SELECTEDMEASURE()
 LY = 
 CALCULATE(
     SELECTEDMEASURE(),
-    SAMEPERIODLASTYEAR('Date'[FullDateAlternateKey])
+    SAMEPERIODLASTYEAR(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -206,7 +206,7 @@ CALCULATE(
 MTD = 
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESMTD('Date'[FullDateAlternateKey])
+    DATESMTD(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -222,7 +222,7 @@ CALCULATE(
 QTD = 
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESQTD('Date'[FullDateAlternateKey])
+    DATESQTD(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -238,7 +238,7 @@ CALCULATE(
 YTD = 
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESYTD('Date'[Full Date])
+    DATESYTD(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -254,7 +254,7 @@ CALCULATE(
 Prev Year = 
 CALCULATE(
     SELECTEDMEASURE(),
-    SAMEPERIODLASTYEAR('Date'[Full Date])
+    SAMEPERIODLASTYEAR(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -274,51 +274,51 @@ CALCULATE(
 
 ```dax
 // Base Measures
-Order Sales Amount = SUM('Reseller Sales'[Sales Amount])
-Total Cost = SUM('Reseller Sales'[TotalProductCost])
+Order Sales Amount = SUM(FactResellerSales[SalesAmount])
+Total Cost = SUM(FactResellerSales[TotalProductCost])
 
 // Time Intelligence Measures สำหรับ Order Sales Amount
 Order Sales Amount MTD = 
 CALCULATE(
     [Order Sales Amount],
-    DATESMTD('Date'[Full Date])
+    DATESMTD(DimDate[FullDateAlternateKey])
 )
 
 Order Sales Amount QTD = 
 CALCULATE(
     [Order Sales Amount],
-    DATESQTD('Date'[Full Date])
+    DATESQTD(DimDate[FullDateAlternateKey])
 )
 
 Order Sales Amount YTD = 
 CALCULATE(
     [Order Sales Amount],
-    DATESYTD('Date'[Full Date])
+    DATESYTD(DimDate[FullDateAlternateKey])
 )
 
 // Time Intelligence Measures สำหรับ Total Cost
 Total Cost MTD = 
 CALCULATE(
     [Total Cost],
-    DATESMTD('Date'[Full Date])
+    DATESMTD(DimDate[FullDateAlternateKey])
 )
 
 Total Cost QTD = 
 CALCULATE(
     [Total Cost],
-    DATESQTD('Date'[Full Date])
+    DATESQTD(DimDate[FullDateAlternateKey])
 )
 
 Total Cost YTD = 
 CALCULATE(
     [Total Cost],
-    DATESYTD('Date'[Full Date])
+    DATESYTD(DimDate[FullDateAlternateKey])
 )
 ```
 
 **ผลลัพธ์:** 8 Measures (2 Base + 6 Time Intelligence)
 
-**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW
+**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW2025
 
 ---
 
@@ -328,8 +328,8 @@ CALCULATE(
 
 ```dax
 // Base Measures (สร้างเพียง 2 ตัว)
-Order Sales Amount = SUM('Reseller Sales'[Sales Amount])
-Total Cost = SUM('Reseller Sales'[TotalProductCost])
+Order Sales Amount = SUM(FactResellerSales[SalesAmount])
+Total Cost = SUM(FactResellerSales[TotalProductCost])
 
 // Calculation Group: "Time Intelligence"
 calculationItem 'Current Period' = SELECTEDMEASURE()
@@ -337,25 +337,25 @@ calculationItem 'Current Period' = SELECTEDMEASURE()
 calculationItem 'Prev Year' =
     CALCULATE(
         SELECTEDMEASURE(),
-        SAMEPERIODLASTYEAR('Date'[Full Date])
+        SAMEPERIODLASTYEAR(DimDate[FullDateAlternateKey])
     )
 
 calculationItem MTD =
     CALCULATE(
         SELECTEDMEASURE(),
-        DATESMTD('Date'[Full Date])
+        DATESMTD(DimDate[FullDateAlternateKey])
     )
 
 calculationItem QTD =
     CALCULATE(
         SELECTEDMEASURE(),
-        DATESQTD('Date'[Full Date])
+        DATESQTD(DimDate[FullDateAlternateKey])
     )
 
 calculationItem YTD =
     CALCULATE(
         SELECTEDMEASURE(),
-        DATESYTD('Date'[Full Date])
+        DATESYTD(DimDate[FullDateAlternateKey])
     )
 ```
 
@@ -366,7 +366,7 @@ calculationItem YTD =
 - เมื่อต้องการเปลี่ยน Logic (เช่น ปรับสูตร YTD) แก้ไขที่ Calculation Item เดียว
 - Model เรียบง่ายขึ้น และดูแลรักษาง่ายขึ้น
 
-**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW
+**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW2025
 
 ---
 
@@ -404,23 +404,23 @@ Calculation Group: "Conversion Rate"
 'Conversion (AVG)' =
     VAR _rate =
         CALCULATE (
-            AVERAGE ( CurrencyRate[AverageRate] ),
-            CROSSFILTER ( 'Date'[Date Key], CurrencyRate[DateKey], BOTH )
+            AVERAGE ( FactCurrencyRate[AverageRate] ),
+            CROSSFILTER ( DimDate[DateKey], FactCurrencyRate[DateKey], BOTH )
         )
     RETURN
         SELECTEDMEASURE () * _rate
 ```
 
 **อธิบาย:**
-- คำนวณ Average Exchange Rate จาก CurrencyRate table
-- ใช้ `CROSSFILTER()` เพื่อเชื่อม Date Dimension กับ CurrencyRate table
+- คำนวณ Average Exchange Rate จาก FactCurrencyRate table
+- ใช้ `CROSSFILTER()` เพื่อเชื่อม Date Dimension กับ FactCurrencyRate table
 - `CROSSFILTER(..., BOTH)` เปิดใช้งาน Bidirectional Filter
 - คูณ `SELECTEDMEASURE()` ด้วย Average Rate
 
 **เหตุผลใช้ CROSSFILTER():**
-- CurrencyRate table ไม่ได้เชื่อมโดยตรงกับ Fact Table
+- FactCurrencyRate table ไม่ได้เชื่อมโดยตรงกับ Fact Table
 - ต้องใช้ Date Dimension เป็นตัวเชื่อม
-- CROSSFILTER() ช่วยให้สามารถ Filter CurrencyRate จาก Date ใน Visual ได้
+- CROSSFILTER() ช่วยให้สามารถ Filter FactCurrencyRate จาก Date ใน Visual ได้
 
 ---
 
@@ -430,16 +430,16 @@ Calculation Group: "Conversion Rate"
 'Conversion (EOD)' =
     VAR _rate =
         CALCULATE (
-            AVERAGE ( CurrencyRate[EndOfDayRate] ),
-            CROSSFILTER ( 'Date'[Date Key], CurrencyRate[DateKey], BOTH )
+            AVERAGE ( FactCurrencyRate[EndOfDayRate] ),
+            CROSSFILTER ( DimDate[DateKey], FactCurrencyRate[DateKey], BOTH )
         )
     RETURN
         SELECTEDMEASURE () * _rate
 ```
 
 **อธิบาย:**
-- คำนวณ End of Day Exchange Rate จาก CurrencyRate table
-- ใช้ `CROSSFILTER()` เพื่อเชื่อม Date Dimension กับ CurrencyRate table
+- คำนวณ End of Day Exchange Rate จาก FactCurrencyRate table
+- ใช้ `CROSSFILTER()` เพื่อเชื่อม Date Dimension กับ FactCurrencyRate table
 - คูณ `SELECTEDMEASURE()` ด้วย End of Day Rate
 
 **ตัวอย่างการใช้งาน:**
@@ -447,7 +447,7 @@ Calculation Group: "Conversion Rate"
 - จะคำนวณอัตราแลกเปลี่ยนเฉลี่ยสำหรับวันที่ 2024-03-15
 - แล้วคูณด้วย Measure ที่เลือก (เช่น Total Sales)
 
-**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW
+**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW2025
 
 ---
 
@@ -479,7 +479,7 @@ Current = SELECTEDMEASURE()
 LY = 
 CALCULATE(
     SELECTEDMEASURE(),
-    SAMEPERIODLASTYEAR('Date'[FullDateAlternateKey])
+    SAMEPERIODLASTYEAR(DimDate[FullDateAlternateKey])
 )
 ```
 

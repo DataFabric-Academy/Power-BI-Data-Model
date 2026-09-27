@@ -4,7 +4,7 @@
 
 โมดูลนี้เกี่ยวกับการออกแบบ Fact Tables และการสร้าง Measures (Explicit Measures) รวมถึง Calculation Groups ใน Power BI Semantic Model
 
-> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW**
+> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW2025**
 
 ---
 
@@ -137,6 +137,20 @@ Average Sales = AVERAGE(FactResellerSales[SalesAmount])
 - **Display Column**: Column ที่ใช้แสดงชื่อ Calculation Items
 - **Ordinal Column**: Column ที่ใช้เรียงลำดับ Calculation Items
 
+#### 4.3 การสร้าง Calculation Group ใน Power BI Desktop ⭐ (ของใหม่ - GA)
+
+> **ของใหม่ 2024–2025:** ก่อนหน้านี้ต้องสร้าง Calculation Group ผ่าน External Tool (Tabular Editor) เท่านั้น ปัจจุบันสร้างได้โดยตรงใน **Model view** ของ Power BI Desktop แล้ว (GA) — ดู [Create calculation groups - Microsoft Learn](https://learn.microsoft.com/power-bi/transform-model/calculation-groups)
+
+**ขั้นตอนใน Model view:**
+1. ไปที่ **Model view** แล้วเลือกปุ่ม **Calculation group** ใน ribbon
+2. Power BI สร้าง Calculation Item แรกให้อัตโนมัติ — ตั้งชื่อและเขียน Expression
+3. เพิ่ม/เรียงลำดับ Calculation Items ได้จากโหนด **Calculation items** ใน **Properties pane**
+
+**ข้อควรรู้:**
+- การสร้าง Calculation Group จะเปิด **Discourage implicit measures** ให้อัตโนมัติ (Calculation Item ทำงานกับ Explicit Measures เท่านั้น — เชื่อมโยงกับหัวข้อ Don't Summarize ข้างบน)
+- ทางเลือกอื่น: สร้างผ่าน **TMDL View** ใน Desktop (เหมาะกับการ reuse script) หรือ Tabular Editor (เหมาะกับ batch/automation)
+- ทดสอบผลลัพธ์ได้เร็วด้วย **DAX Query View** ใน Desktop
+
 ---
 
 ### 5. SELECTEDMEASURE() Function
@@ -159,7 +173,7 @@ calculationItem Current = SELECTEDMEASURE()
 calculationItem YTD = 
 CALCULATE(
     SELECTEDMEASURE(),
-    DATESYTD('Date'[FullDateAlternateKey])
+    DATESYTD(DimDate[FullDateAlternateKey])
 )
 ```
 
@@ -240,7 +254,7 @@ Measure to Show =
 - เมื่อต้องการเปลี่ยน Logic (เช่น ปรับสูตร YTD) ต้องแก้ไขทุก Measure
 - Model มี Measures จำนวนมาก ทำให้ดูแลรักษายาก
 
-**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW
+**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW2025
 
 ---
 
@@ -249,8 +263,8 @@ Measure to Show =
 **เมื่อใช้ Calculation Group** สร้างเพียง Base Measures และ Calculation Group:
 
 **Base Measures:**
-- `Order Sales Amount = SUM('Reseller Sales'[Sales Amount])`
-- `Total Cost = SUM('Reseller Sales'[TotalProductCost])`
+- `Order Sales Amount = SUM(FactResellerSales[SalesAmount])`
+- `Total Cost = SUM(FactResellerSales[TotalProductCost])`
 
 **Calculation Group: "Time Intelligence"**
 - **Current Period**: `SELECTEDMEASURE()`
@@ -264,7 +278,7 @@ Measure to Show =
 - เมื่อต้องการเปลี่ยน Logic (เช่น ปรับสูตร YTD) แก้ไขที่ Calculation Item เดียว
 - Model เรียบง่ายขึ้น และดูแลรักษาง่ายขึ้น
 
-**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW
+**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW2025
 
 ---
 
@@ -320,14 +334,14 @@ Measure to Show =
 
 #### 9.2 การใช้ CROSSFILTER()
 
-**เมื่อต้องเชื่อมกับ CurrencyRate table:**
+**เมื่อต้องเชื่อมกับ FactCurrencyRate table:**
 
 ```dax
 calculationItem 'Conversion (AVG)' =
     VAR _rate =
         CALCULATE (
-            AVERAGE ( CurrencyRate[AverageRate] ),
-            CROSSFILTER ( 'Date'[Date Key], CurrencyRate[DateKey], BOTH )
+            AVERAGE ( FactCurrencyRate[AverageRate] ),
+            CROSSFILTER ( DimDate[DateKey], FactCurrencyRate[DateKey], BOTH )
         )
     RETURN
         SELECTEDMEASURE () * _rate
@@ -335,15 +349,15 @@ calculationItem 'Conversion (AVG)' =
 calculationItem 'Conversion (EOD)' =
     VAR _rate =
         CALCULATE (
-            AVERAGE ( CurrencyRate[EndOfDayRate] ),
-            CROSSFILTER ( 'Date'[Date Key], CurrencyRate[DateKey], BOTH )
+            AVERAGE ( FactCurrencyRate[EndOfDayRate] ),
+            CROSSFILTER ( DimDate[DateKey], FactCurrencyRate[DateKey], BOTH )
         )
     RETURN
         SELECTEDMEASURE () * _rate
 ```
 
 **อธิบาย:**
-- ใช้ `CROSSFILTER()` เพื่อเชื่อม Date Dimension กับ CurrencyRate table
+- ใช้ `CROSSFILTER()` เพื่อเชื่อม Date Dimension กับ FactCurrencyRate table
 - `AVERAGE()` เพื่อหาอัตราแลกเปลี่ยนเฉลี่ย
 - คูณ `SELECTEDMEASURE()` ด้วยอัตราแลกเปลี่ยน
 
@@ -352,7 +366,7 @@ calculationItem 'Conversion (EOD)' =
 - สามารถนำ Calculation Group ไปใช้กับทุก Measure ที่ต้องแปลงค่าได้โดยอัตโนมัติ
 - รองรับหลายอัตราแลกเปลี่ยน (Average, End of Day)
 
-**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW
+**หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW2025
 **👉 ดูเพิ่มเติม**: [CODE-EXAMPLES.md](./CODE-EXAMPLES.md)
 
 ---
@@ -402,7 +416,7 @@ calculationItem 'Conversion (EOD)' =
 
 ### ไฟล์ตัวอย่างที่แนะนำ
 
-**หมายเหตุ:** ตัวอย่างในโมดูลนี้ใช้ AdventureWorksDW เป็น Data Source
+**หมายเหตุ:** ตัวอย่างในโมดูลนี้ใช้ AdventureWorksDW2025 เป็น Data Source
 
 ---
 

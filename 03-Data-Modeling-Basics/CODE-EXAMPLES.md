@@ -10,7 +10,7 @@
 
 ## 1. Star Schema Structure
 
-### ตัวอย่างโครงสร้างจาก AdventureWorksDW
+### ตัวอย่างโครงสร้างจาก AdventureWorksDW2025
 
 **Fact Table: FactResellerSales**
 

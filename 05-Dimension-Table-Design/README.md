@@ -4,7 +4,7 @@
 
 โมดูลนี้เกี่ยวกับการออกแบบ Dimension Tables ที่มีประสิทธิภาพและถูกต้องตามหลักการ Dimensional Modeling
 
-> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW**
+> **Data Source:** ตัวอย่างทั้งหมดใช้ **AdventureWorksDW2025**
 
 ---
 
@@ -21,7 +21,7 @@
 - ใช้ในการเชื่อมโยงกับตาราง Fact
 - ไม่มีความหมายทางธุรกิจ
 
-**ตัวอย่าง (AdventureWorksDW):**
+**ตัวอย่าง (AdventureWorksDW2025):**
 - `DimProduct[ProductKey]` - ProductKey เป็น Surrogate Key
 - `DimDate[DateKey]` - DateKey เป็น Surrogate Key
 
@@ -34,14 +34,14 @@
 - อาจเปลี่ยนแปลงได้
 - ไม่ใช่ Primary Key ใน Semantic Model
 
-**ตัวอย่าง (AdventureWorksDW):**
+**ตัวอย่าง (AdventureWorksDW2025):**
 - `DimProduct[ProductAlternateKey]` - ProductAlternateKey เป็น Business Key
 
 #### 1.3 Dimension Attributes
 
 **Dimension Attributes** เป็นคุณลักษณะที่ให้รายละเอียดเพิ่มเติมเกี่ยวกับข้อมูล
 
-**ตัวอย่าง (AdventureWorksDW):**
+**ตัวอย่าง (AdventureWorksDW2025):**
 - `DimProduct[EnglishProductName]` - ชื่อสินค้า
 - `DimProduct[Color]` - สี
 - `DimProduct[Size]` - ขนาด
@@ -96,7 +96,7 @@
 **หมายเหตุ:** เนื้อหารายละเอียดเกี่ยวกับ Role-Playing Dimensions โดยเฉพาะกับ Date Dimension ได้ถูกย้ายไปยังโมดูล **06-Date-Dimensions-Relationships** ซึ่งครอบคลุม:
 - ความหมายและวิธีการสร้าง Role-Playing Dimensions
 - การใช้ Inactive Relationships
-- ตัวอย่างการใช้งานกับ AdventureWorksDW
+- ตัวอย่างการใช้งานกับ AdventureWorksDW2025
 - การใช้ USERELATIONSHIP() กับ Role-Playing
 
 **👉 ดูรายละเอียด:** [06-Date-Dimensions-Relationships](../06-Date-Dimensions-Relationships/README.md#2-role-playing-dimensions-ตารางมิติบทบาท)
@@ -136,7 +136,7 @@
 - **IsCurrent**: Flag ที่บอกว่า Record เป็นปัจจุบันหรือไม่ (TRUE/FALSE)
 - **Hash**: Hash Value ที่สร้างจาก Dimension Attributes เพื่อตรวจสอบการเปลี่ยนแปลง
 
-**ตัวอย่างจากไฟล์ตัวอย่าง (`Data Model SCD.SemanticModel`):**
+**ตัวอย่างจากไฟล์ตัวอย่าง (`Data Model SCD.pbix`):**
 
 **ตาราง FullLoad (SCD Type 2 Dimension):**
 
@@ -194,8 +194,9 @@
 **👉 ดูแบบฝึกหัด:** [EXERCISES.md](./EXERCISES.md)
 
 **ไฟล์ตัวอย่าง:**
-- `Data Model SCD.SemanticModel` - Semantic Model ที่มี SCD Type 2 Implementation
-- `Data Model SCD.Report` - Report ที่แสดงผลลัพธ์
+- `Data Model SCD.pbix` - Semantic Model ที่มี SCD Type 2 Implementation พร้อม Report ที่แสดงผลลัพธ์
+
+> **หมายเหตุ:** ไฟล์ตัวอย่างเป็นสื่อการสอนของผู้สอน (Trainer Material) — ขอไฟล์ได้จากผู้สอนระหว่างเรียน ไม่ได้แจกจ่ายผ่าน repository นี้
 
 ---
 
@@ -213,13 +214,15 @@
 
 **วิธีการปิดใช้งาน:**
 
-**วิธีที่ 1: ใช้ TMDL View**
-1. เลือกไปที่มุมมอง TMDL View
+**วิธีที่ 1: ใช้ TMDL View ใน Power BI Desktop (แนะนำ - GA)**
+1. เลือกไปที่มุมมอง TMDL View ใน Power BI Desktop
 2. ใน Data pane เลือก Model > Tables
 3. ลากคอลัมน์จากตาราง Dimension ลงใน Design pane
-4. จะปรากฏ TDML เฉพาะส่วนของคอลัมน์ที่เลือก
+4. จะปรากฏ TMDL เฉพาะส่วนของคอลัมน์ที่เลือก
 5. เพิ่ม `IsAvailableInMDX = false` ลงใน Script
 6. กดปุ่ม APPLY
+
+> **ของใหม่:** TMDL View ใน Power BI Desktop เป็น GA แล้ว (ตั้งแต่กันยายน 2025) — ดู [Work with TMDL view - Microsoft Learn](https://learn.microsoft.com/power-bi/transform-model/desktop-tmdl-view)
 
 **วิธีที่ 2: ใช้ Tabular Editor**
 1. ในเมนู External Tools ของ Power BI Desktop เลือก Tabular Editor
@@ -392,7 +395,7 @@ PathLEN = PATHLENGTH(Employee[Path])
    - สร้าง Hierarchy ชื่อ "Organization"
    - เพิ่ม Levels: Org Level 1, Org Level 2, Org Level 3, ...
 
-**👉 ตัวอย่าง:** Parent-Child Hierarchy จาก AdventureWorksDW
+**👉 ตัวอย่าง:** Parent-Child Hierarchy จาก AdventureWorksDW2025
 
 ---
 
@@ -466,7 +469,7 @@ PathLEN = PATHLENGTH(Employee[Path])
 
 ### ไฟล์ตัวอย่างที่แนะนำ
 
-**หมายเหตุ:** ตัวอย่างในโมดูลนี้ใช้ AdventureWorksDW เป็น Data Source
+**หมายเหตุ:** ตัวอย่างในโมดูลนี้ใช้ AdventureWorksDW2025 เป็น Data Source
 
 ---
 

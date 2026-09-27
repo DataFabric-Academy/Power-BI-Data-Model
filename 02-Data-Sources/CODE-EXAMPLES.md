@@ -6,16 +6,16 @@
 
 ---
 
-## 1. การเชื่อมต่อ AdventureWorksDW
+## 1. การเชื่อมต่อ AdventureWorksDW2025
 
 ### ข้อมูลการเชื่อมต่อ Azure SQL Database
 
 ```
-Server Name: xxx.database.windows.net
-Database Name: AdventureworksDW
+Server Name: ake.database.windows.net
+Database Name: AdventureWorksDW2025
 Authentication: Database Authentication
-Login Name: student
-Password: Pa55w.rd
+Login Name: dwuser
+Password: <password ที่ได้รับจากผู้สอน>
 ```
 
 ### ขั้นตอนการเชื่อมต่อ
@@ -23,7 +23,7 @@ Password: Pa55w.rd
 1. ใน Power BI Desktop เลือก **Get Data** > **Azure** > **Azure SQL Database**
 2. กรอกข้อมูลการเชื่อมต่อ:
    - Server: `ake.database.windows.net`
-   - Database: `AdventureworksDW`
+   - Database: `AdventureWorksDW2025`
 3. เลือก **Database Authentication**
 4. กรอก Login Name และ Password
 5. กด **Connect**
@@ -222,7 +222,7 @@ in
    - ใช้ DirectQuery Mode เมื่อต้องการ Real-time (ข้อมูลใหญ่)
    - ใช้ Direct Lake Mode เมื่อมี Fabric/Premium + ต้องการ Performance สูง + Real-time
 
-3. **ใช้ AdventureWorksDW**:
+3. **ใช้ AdventureWorksDW2025**:
    - ข้อมูลตัวอย่างที่สมบูรณ์แบบ
    - มี Star Schema Structure
    - เหมาะสำหรับการเรียนรู้
