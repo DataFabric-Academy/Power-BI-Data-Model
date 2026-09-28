@@ -415,6 +415,40 @@ Category = RELATED(DimProductSubcategory[EnglishProductCategoryName])
 
 ---
 
+### ตัวอย่างที่ 5b: ยุบรวม Snowflake เป็น Star ตั้งแต่ Power Query ⭐ (จากไฟล์จริง)
+
+ทางเลือกที่ดีกว่าการพึ่ง RELATED() ตอน query: **flatten ตาราง snowflake ตั้งแต่ตอน import** ได้ dimension เดียวจบ ไม่ต้องมีตารางย่อยและ relationship เพิ่ม (ดีต่อ VertiPaq: ลดจำนวน table/relationship)
+
+**ตัวอย่างจริง: ยุบ DimGeography เข้า DimReseller ใน Power Query**
+
+```m
+let
+    Source = Sql.Database("ake.database.windows.net", "AdventureWorksDW2025"),
+    dbo_DimReseller = Source{[Schema="dbo",Item="DimReseller"]}[Data],
+    // Sql.Database แนบ navigation column ของตารางที่มี FK มาให้แล้ว
+    // (DimReseller มี record "DimGeography" อยู่ในตัว — ไม่ต้อง join เอง)
+    #"Expanded DimGeography" = Table.ExpandRecordColumn(dbo_DimReseller, "DimGeography",
+        {"City", "StateProvinceName", "CountryRegionCode", "PostalCode", "SalesTerritoryKey"},
+        {"City", "StateProvinceName", "CountryRegionCode", "PostalCode", "SalesTerritoryKey"}),
+    // เลือกเฉพาะคอลัมน์ที่ต้องการ (ตัด GeographyKey ที่ไม่มีประโยชน์ต่อไปทิ้ง)
+    #"Removed Other Columns" = Table.SelectColumns(#"Expanded DimGeography",
+        {"ResellerKey", "BusinessType", "ResellerName", "City", "StateProvinceName",
+         "CountryRegionCode", "PostalCode"})
+in
+    #"Removed Other Columns"
+```
+
+**จากนั้นสร้าง Hierarchy ฝั่ง model:** `Geography` = Country Region → State Province → City
+
+**ข้อควรรู้ (gotcha จริงที่เจอ):**
+- Navigation column (เช่น `"DimGeography"`) **มีอยู่ในตารางแล้ว** — ถ้าไป `Table.NestedJoin` ตั้งชื่อ column ใหม่ซ้ำกับมัน จะเจอ error `The column 'DimGeography' already exists` — วิธี flatten ที่สั้นสุดคือ `Table.ExpandRecordColumn` บน navigation column ที่ได้มาฟรีเลย
+- นี่คือ pattern เดียวกับที่ DimProduct ใช้ (Expand `"DimProductSubcategory"` ซ้อน `"DimProductCategory"`)
+- ถ้า refresh พังกลางทางจน partition ค้าง ให้ clear ค่าตารางนั้นก่อนแก้ M แล้ว refresh ใหม่
+
+**ไฟล์ตัวอย่าง:** `Data Model - Reseller Sales.pbix` — *Trainer Material — ขอไฟล์จากผู้สอน*
+
+---
+
 ## 🎯 Calculated Tables สำหรับ Dimension Tables
 
 ### ตัวอย่างที่ 6: สร้าง Dimension Table จากหลาย Sources

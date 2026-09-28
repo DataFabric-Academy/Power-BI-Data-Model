@@ -158,6 +158,81 @@ Reseller Sales Revenue = SUM(FactResellerSales[SalesAmount])
 
 ---
 
+### ตัวอย่างที่ 6b: Daily Allocation ด้วย CROSSFILTER(None) + TREATAS (จากไฟล์จริง AdventureWorksDW2025)
+
+จัดสรร quota รายไตรมาสลงเป็นรายวัน เพื่อเทียบกับยอดขายรายวันใน visual เดียว
+
+**ข้อเท็จจริงของ FactSalesQuota บนข้อมูลจริง:**
+- Grain = รายพนักงานต่อไตรมาส (แถว 10–17 แถว/ไตรมาส ตามขนาดทีม)
+- วันที่ anchor ไม่ตรง boundary: ปี 2011 คือ 31 มี.ค. / 30 มิ.ย. / 29 ก.ย. / 29 ธ.ค.
+- จึง map ด้วยคู่ `(CalendarYear, CalendarQuarter)` ของตารางโควตาเอง — ห้ามคำนวณจากวันที่
+
+**Relationships ที่ใช้:**
+```
+FactSalesQuota[DateKey]     --> DimDate[DateKey]     (Active — ใช้กับ measure ธรรมดา)
+FactSalesQuota[EmployeeKey] --> DimEmployee[EmployeeKey] (Active)
+```
+
+**Measure ธรรมดา (ใช้ระดับไตรมาสขึ้นไป):**
+```dax
+'Sales Quota Amount' = SUM ( FactSalesQuota[SalesAmountQuota] )
+```
+
+**Measure จัดสรรรายวัน:**
+```dax
+'Sales Quota Amount (Daily Alloc)' =
+// โควตาต่อวัน = โควตาของไตรมาสนั้น / จำนวนวันของไตรมาส
+// 1) CROSSFILTER(None) ปิด relationship วันที่ชั่วคราว ไม่ให้ filter "วัน" กลั่นแถวโควตา
+// 2) TREATAS ทาบคู่ (ปี, ไตรมาส) กลับเข้าตารางโควตา (virtual relationship)
+SUMX (
+    VALUES ( DimDate[FullDateAlternateKey] ),
+    VAR CurrentDate = DimDate[FullDateAlternateKey]
+    VAR CurrentYear = YEAR ( CurrentDate )
+    VAR CurrentQuarter = ROUNDUP ( DIVIDE ( MONTH ( CurrentDate ), 3 ), 0 )
+    VAR QuarterQuota =
+        CALCULATE (
+            SUM ( FactSalesQuota[SalesAmountQuota] ),
+            CROSSFILTER ( FactSalesQuota[DateKey], DimDate[DateKey], None ),
+            TREATAS (
+                { ( CurrentYear, CurrentQuarter ) },
+                FactSalesQuota[CalendarYear],
+                FactSalesQuota[CalendarQuarter]
+            )
+        )
+    VAR QuarterStart = DATE ( CurrentYear, CurrentQuarter * 3 - 2, 1 )
+    VAR QuarterEnd = EOMONTH ( QuarterStart, 2 )
+    VAR DaysInQuarter = COUNTROWS ( CALENDAR ( QuarterStart, QuarterEnd ) )
+    RETURN
+        DIVIDE ( QuarterQuota, DaysInQuarter )
+)
+```
+
+**ตรวจสอบด้วยข้อมูลจริง:**
+
+```dax
+EVALUATE
+SUMMARIZECOLUMNS (
+    DimDate[FullDateAlternateKey],
+    TREATAS (
+        { DATE ( 2011, 4, 8 ), DATE ( 2011, 6, 30 ), DATE ( 2011, 7, 1 ) },
+        DimDate[FullDateAlternateKey]
+    ),
+    "Quota (plain)", [Sales Quota Amount],
+    "Quota (Daily Alloc)", [Sales Quota Amount (Daily Alloc)]
+)
+```
+
+| วันที่ | Quota (plain) | Quota (Daily Alloc) |
+|---|---|---|
+| 8 เม.ย. 2011 | (blank) | 52,198 |
+| 30 มิ.ย. 2011 | 4,750,000 | 52,198 |
+| 1 ก.ค. 2011 | (blank) | 55,087 (= Q3 5,068,000 ÷ 92 วัน) |
+
+- รวมทั้งปี 2011: ทั้งสอง measure ให้ค่าเดียวกัน (25,982,000) — ตัวจัดสรรแค่กระจายลงวัน
+- ช่วงที่ไม่มีแถวโควตา (เช่น ไตรมาส 2/2011 ก่อนแก้ต้นทาง) ตัวจัดสรรจะ blank อย่างถูกต้อง — จุดคุยเรื่อง data quality ในคลาส
+
+---
+
 ## 🎯 Bidirectional Filters
 
 ### ตัวอย่างที่ 7: การตั้งค่า Bidirectional Filter

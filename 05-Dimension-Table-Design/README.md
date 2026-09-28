@@ -413,6 +413,37 @@ PathLEN = PATHLENGTH(Employee[Path])
 
 ---
 
+#### 8.8 Parent-Child แบบรองรับความลึกที่เปลี่ยนแปลง (Dynamic Levels) ⭐
+
+**ปัญหา:** User Hierarchy ต้องมี physical columns จำนวนคงที่ — ถ้าสร้าง `Org Level 1-5` ตามความลึกที่เห็น "วันนี้" แล้วองค์กรเพิ่มชั้นที่ 6 ในอนาคต การ drill-down จะ**ตัดขาดเงียบ ๆ โดยไม่มี error** (ผู้ใช้ไม่รู้ว่าเสียข้อมูล)
+
+**วิธีรับมือ 3 ชั้น:**
+
+1. **สร้าง Level เผื่อตาม `PATHLENGTH` ไม่ใช่ตามสายตา** — ข้อมูลปัจจุบันของ DimEmployee ลึกสุด 5 ชั้น (พนักงาน 296 คน) แต่สร้างคอลัมน์ไว้ถึง Org Level 7:
+
+   ```dax
+   Org Level 6 =
+   LOOKUPVALUE(
+       DimEmployee[EmployeeName],
+       DimEmployee[EmployeeKey],
+       PATHITEM(DimEmployee[EmpPath], 6, INTEGER)
+   )
+   ```
+
+2. **เปิด `Hide blank members` (HideBlankMembers) ที่ Hierarchy** — ชั้นที่ blank (เกินความลึกของกิ่งนั้น) จะไม่แสดงใน visual กิ่งสั้น drill สั้น กิ่งลึก drill ลึก แม้ hierarchy มี 7 ชั้น ผู้ใช้เห็น "เท่าที่ข้อมูลมี" — นี่คือความ dynamic ที่ Power BI ให้ได้จริง
+
+3. **Measure เฝ้าความลึก** เป็นตัวเตือนเมื่อข้อมูลลึกเกิน column ที่เผื่อไว้:
+
+   ```dax
+   'Max Org Depth' = MAX ( DimEmployee[EmpPathLength] )
+   ```
+
+   ถ้าค่านี้เกิน 7 → ต้องเพิ่ม `Org Level 8` และใส่เข้า Hierarchy ทันที (ไม่งั้นการ drill ตัดขาดโดยไม่มีสัญญาณเตือน)
+
+**ไฟล์ตัวอย่าง:** `Data Model - Reseller Sales.pbix` — *Trainer Material — ขอไฟล์จากผู้สอน*
+
+---
+
 ### 9. การซ่อน Attributes
 
 **ควรซ่อน Attributes ต่อไปนี้:**

@@ -299,6 +299,41 @@ Measure to Show =
 
 ---
 
+#### 7.4 แนวทาง Modern: Offset Columns กับ LY (Offset) ⭐ (ของใหม่)
+
+นอกจากการใช้ Time Intelligence Functions แบบ Classic (`SAMEPERIODLASTYEAR`, `DATESYTD`) แล้ว ยังใช้แนวทาง **Offset Columns** ได้ — เพิ่มคอลัมน์ระยะห่างจากปัจจุบันใน DimDate (Calculated Column) เช่น
+
+```dax
+MonthOffset = DATEDIFF ( TODAY (), DimDate[FullDateAlternateKey], MONTH )
+YearOffset  = DATEDIFF ( TODAY (), DimDate[FullDateAlternateKey], YEAR )
+```
+
+(เดือนปัจจุบัน = 0, อดีต = ติดลบ — ค่าถูกคำนวณตอน refresh ข้อมูล)
+
+แล้วเขียน Calculation Item "LY (Offset)" โดยเลื่อน offset ไป −12 แทนการ override filter วันที่:
+
+```dax
+VAR SelectedOffsets =
+    SELECTCOLUMNS ( VALUES ( DimDate[MonthOffset] ), "@Prev", [MonthOffset] - 12 )
+RETURN
+    CALCULATE (
+        SELECTEDMEASURE (),
+        REMOVEFILTERS ( DimDate ),
+        DimDate[MonthOffset] IN SelectedOffsets
+    )
+```
+
+**จุดเด่นของ Offset:**
+- ทำงานกับปฏิทินพิเศษ (4-4-5, Fiscal) ได้โดยไม่ต้องปรับสูตร
+- เป็น filter ธรรมดา ไม่ไป override ทาง date relationship
+- บนข้อมูลจริงของ AdventureWorksDW2025 ผลของ `LY (Offset)` **ตรงกับ `SAMEPERIODLASTYEAR` ทุกปี** — ตอนสอนจึงเทียบสองแนวทางใน Calculation Group เดียวได้ (ดู [CODE-EXAMPLES.md](./CODE-EXAMPLES.md))
+
+**หมายเหตุ:** `TODAY()` จะคำนวณใหม่ตอน refresh ข้อมูล จึงต้อง refresh ตาราง DimDate เพื่อให้ค่าตรงกับวันปัจจุบัน
+
+**👉 ดูเพิ่มเติม**: [CODE-EXAMPLES.md](./CODE-EXAMPLES.md)
+
+---
+
 ### 8. Multiple Calculation Groups
 
 **เมื่อมีหลาย Calculation Groups:**
@@ -371,6 +406,54 @@ calculationItem 'Conversion (EOD)' =
 
 ---
 
+#### 9.3 ข้อจำกัดเชิง Semantic ของสูตรง่าย ⭐ (สำคัญ)
+
+สูตร `SELECTEDMEASURE() * AVERAGE(rate)` ข้างบน**ถูกต้องเมื่อโมเดลมีเงื่อนไขครบ** แต่ใน AdventureWorksDW2025 จริง ๆ จะเจอปัญหาสามข้อ (ผมวัดตัวเลขจริงมาแล้ว):
+
+| สถานการณ์ | อาการ | ตัวเลขจริงที่วัดได้ (ปี 2013) |
+|---|---|---|
+| **ไม่เลือกสกุลใน slicer** | `AVERAGE(rate)` เฉลี่ยข้ามทุกสกุลที่มี rate (14 สกุล) แล้วคูณยอดรวม → ตัวเลขไร้ความหมาย | 33.57M กลายเป็น 16.49M |
+| **เลือกสกุล เช่น GBP** | relationship `DimCurrency → FactResellerSales` ตัดยอดให้เหลือเฉพาะแถวที่บันทึกด้วย GBP ก่อน แล้วค่อยคูณ rate | ได้แค่ 2.72M (ยอด nominal แถว GBP) ไม่ใช่ยอดทั้งบริษัทเป็นปอนด์ (21.81M) |
+| **ทิศทางของ rate** | rate ของ AW = "จำนวน USD ต่อ 1 หน่วยของสกุลนั้น" → `× rate` ให้ผลสกุลถิ่น→USD เท่านั้น | อยากแสดง "ยอดทั้งบริษัทเป็นสกุล X" ต้องแปลงสวนทาง |
+
+**ข้อสรุปสำหรับการสอน:** สูตรสั้นหรือยาวเป็นผลมาจาก **การออกแบบโมเดล** ไม่ใช่ฝีมือเขียน DAX —
+
+- โมเดลที่ยอดเก็บสกุลเดียว (pivot currency) + currency ไม่ผูกกับตารางขาย → สูตร 6 บรรทัดแบบ §9.2 จบ (แบบนี้คือสมมติฐานของตัวอย่างทางการบน Microsoft Learn)
+- โมเดลที่ fact เก็บ**หลายสกุลปนกัน** (AW จริงเก็บ 6 สกุล: USD, CAD, GBP, EUR, AUD ฯลฯ) และอยากให้ slicer เป็น "ตัวเลือกสกุลแสดงผล" → ต้องใช้ cross-rate (§9.4)
+
+#### 9.4 Display Currency: แปลงทุกสกุลเป็นสกุลที่เลือก (cross-rate)
+
+หัวใจคือแยกยอดเป็น **รายวัน × รายสกุลต้นทาง** แล้วแปลงผ่าน USD เป็นตัวกลางด้วย rate ของวันนั้นจริง ๆ:
+
+```
+ยอดแสดงผล = ยอด(แถว) × rate(สกุลต้นทาง, วันนั้น) ÷ rate(สกุลปลายทาง, วันนั้น)
+```
+
+พร้อม `REMOVEFILTERS(DimCurrency)` เพื่อไม่ให้ filter สกุลที่เลือกไหลเข้าไปบังตาราง rate แบบเดียวกับที่ตัวอย่างทางการใช้ (ดู [Calculation groups - currency conversion](https://learn.microsoft.com/analysis-services/tabular-models/calculation-groups)) — โค้ดเต็มอยู่ใน [CODE-EXAMPLES.md](./CODE-EXAMPLES.md) ตัวอย่างที่ 15
+
+ผลตรวจจากข้อมูลจริง (ปี 2013): USD 32.32M / GBP 21.81M / THB 992.99M — สามค่าเทียบกันด้วย cross-rate ได้ตรงกันเอง
+
+#### 9.5 Dynamic Format String ต่อสกุลเงิน
+
+ให้สัญลักษณ์สกุลเงินเปลี่ยนตาม slicer (เช่น € / £ / ฿) โดยเพิ่มคอลัมน์ format string ใน DimCurrency แล้วตั้ง **Format string expression** ของ Calculation Item ตาม pattern ทางการ:
+
+```dax
+SELECTEDVALUE (
+    DimCurrency[CurrencyFormatString],
+    SELECTEDMEASUREFORMATSTRING ()   // fallback: ใช้ format ของ Measure ต้นทาง
+)
+```
+
+**ข้อควรรู้ (จาก Microsoft Learn):**
+- Dynamic format string มีผลเฉพาะใน **visual** — ผล DAX Query จะเห็นแต่ตัวเลขดิบ
+- ถ้า visual แสดงผลเพี้ยน ให้เช็ค **Display units** ของ visual แล้วเปลี่ยนจาก Auto เป็น None
+- เมื่อใช้หลาย Calculation Groups ร่วมกัน **format ของ group ที่ Precedence สูงสุดจะชนะ** — กับโมเดลนี้ `YoY %` จึงต้องพิจารณาลำดับด้วย
+- ถ้าความสัมพันธ์ `DimCurrency → ตารางขาย` ทำให้ slicer มีสองความหมาย (กรองยอด + เลือกสกุลแสดงผล) ให้ทำ relationship เป็น **inactive** แล้วเปิดเฉพาะจุดด้วย `USERELATIONSHIP` (ตัวอย่างใน [CODE-EXAMPLES.md](./CODE-EXAMPLES.md) ตัวอย่างที่ 17)
+
+**👉 ดูเพิ่มเติม**: [CODE-EXAMPLES.md](./CODE-EXAMPLES.md)
+
+---
+
 ## 🎯 วัตถุประสงค์
 
 หลังจากจบโมดูลนี้ ผู้เรียนจะสามารถ:
@@ -415,6 +498,11 @@ calculationItem 'Conversion (EOD)' =
 ---
 
 ### ไฟล์ตัวอย่างที่แนะนำ
+
+- `Data Model Time Intelligence with/without Calculation Group.pbix` — เทียบการทำ Time Intelligence แบบเขียน Measures เอง กับแบบใช้ Calculation Group (หัวข้อ 7)
+- `Data Model Exchange Rate With Calculation Group.pbix` — Calculation Group สำหรับแปลงสกุลเงิน (หัวข้อ 9)
+
+*Trainer Material — ขอไฟล์จากผู้สอน*
 
 **หมายเหตุ:** ตัวอย่างในโมดูลนี้ใช้ AdventureWorksDW2025 เป็น Data Source
 

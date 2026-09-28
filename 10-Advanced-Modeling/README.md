@@ -167,6 +167,42 @@ Reseller Sales Revenue = SUM(FactResellerSales[SalesAmount])
 
 ---
 
+##### วิธีที่ 4: Daily Allocation ด้วย CROSSFILTER(None) + TREATAS ⭐ (ตัวอย่างจริงจาก AdventureWorksDW2025)
+
+สามวิธีข้างบนดูปัญหาจากฝั่งยอดขาย แต่งานจริงมีอีกทางเลือก: **จัดสรร (allocate) quota รายไตรมาสลงเป็นรายวัน** เพื่อเทียบกับยอดขายรายวันได้เลย จากข้อมูลจริงของ AW:
+
+**ลักษณะข้อมูลจริงของ FactSalesQuota:**
+- Grain = **รายพนักงาน ต่อ ไตรมาส** (10–17 แถวต่อไตรมาส ตามขนาดทีมขาย)
+- วันที่ anchor ของแต่ละไตรมาส**ไม่ตรง boundary** เสมอไป เช่น ปี 2011: 31 มี.ค. / 30 มิ.ย. / 29 ก.ย. / 29 ธ.ค. — ดังนั้นห้ามคำนวณจากวันที่ ต้อง map ด้วยคู่ `(CalendarYear, CalendarQuarter)` ของตารางโควตาเอง
+- **ไตรมาส 2/2011 ไม่มีแถวโควตาเลย** และแถวที่ควรเป็น Q2 ถูกบันทึกเป็น 1 ก.ค. tag Q3 (data quality จริงที่ใช้คุยในคลาสได้ — ตัวอย่างถือว่าแก้ที่ต้นทางแล้ว)
+
+**แนวคิดของ Measure:**
+
+```
+โควตาต่อวัน = โควตาของไตรมาสที่วันนั้นสังกัด ÷ จำนวนวันของไตรมาสนั้น
+```
+
+1. `CROSSFILTER(FactSalesQuota[DateKey], DimDate[DateKey], None)` — **ปิด relationship ทางวันที่ชั่วคราว** ไม่ให้ filter "วัน" กลั่นแถวโควตาจนหมด
+2. `TREATAS({(ปี, ไตรมาส)}, FactSalesQuota[CalendarYear], FactSalesQuota[CalendarQuarter])` — ทาบกลับด้วยมิติไตรมาส (virtual relationship)
+3. หารเท่า ๆ ตามจำนวนวันของไตรมาส แล้ว `SUMX` รวม
+
+**ตัวเลขจริงที่ได้:**
+
+| ระดับ | `Sales Quota Amount` (ธรรมดา) | `(Daily Alloc)` |
+|---|---|---|
+| ปี 2011 | 25,982,000 | 25,982,000 ✓ (เท่ากัน — แค่กระจายลงวัน) |
+| วันที่ 30 มิ.ย. 2011 | 4,750,000 (โผล่เฉพาะวัน anchor) | 52,198 = 4.75M ÷ 91 วัน |
+| วันที่อื่น ๆ ของ Q2 | (blank) | 52,198 ทุกวัน |
+
+**ประโยชน์:**
+- เทียบ actual (รายวัน) กับ quota (รายไตรมาส) ได้ใน visual เดียว ทุกระดับ
+- ใช้เทคนิคของคอร์สครบใน measure เดียว: `CROSSFILTER(None)` + `TREATAS`
+- จุดสอน data quality: ตรวจวัน anchor และช่วงที่ขาดข้อมูลของตาราง quota ก่อนเขียน measure เสมอ
+
+**👉 ดูโค้ดเต็ม**: [CODE-EXAMPLES.md](./CODE-EXAMPLES.md)
+
+---
+
 #### 1.3 Best Practices สำหรับ Heterogeneous Granularity
 
 1. **ใช้ Conformed Date Dimension**
@@ -188,6 +224,11 @@ Reseller Sales Revenue = SUM(FactResellerSales[SalesAmount])
 5. **พิจารณา Performance**
    - การ Aggregate ข้อมูลอาจส่งผลต่อ Performance
    - ใช้ VertiPaq Engine Optimization เพื่อเพิ่มประสิทธิภาพ
+
+6. **ตรวจ Grain และวันที่ Anchor ของ Fact ที่หยาบกว่าก่อนเขียน Measure**
+   - ดูว่าตาราง quota/budget มี grain ระดับใด (เดือน/ไตรมาส) และวันที่ anchor ตรง boundary หรือไม่
+   - ถ้า anchor ไม่ตรง ให้ map ด้วยคอลัมน์ปี/ไตรมาสของตารางเอง (`TREATAS`) อย่าคำนวณจากวันที่
+   - ตรวจช่วงเวลาที่ขาดข้อมูล (เช่น ไตรมาสที่ไม่มีแถว) ก่อนเผชิญหน้าผู้เรียน/ผู้ใช้
 
 **👉 ดูเพิ่มเติม**: [CODE-EXAMPLES.md](./CODE-EXAMPLES.md)
 

@@ -266,6 +266,44 @@ CALCULATE(
 
 ---
 
+### Calculation Item: LY (Offset) — แนวทาง Modern ด้วย Offset Columns
+
+**ขั้นที่ 1: เพิ่ม Offset Columns ใน DimDate (Calculated Column, ซ่อนไว้)**
+
+```dax
+MonthOffset =
+// เดือนปัจจุบัน = 0, อดีต = ติดลบ — ค่าคำนวณตอน refresh ข้อมูล
+DATEDIFF ( TODAY (), DimDate[FullDateAlternateKey], MONTH )
+
+YearOffset =
+DATEDIFF ( TODAY (), DimDate[FullDateAlternateKey], YEAR )
+```
+
+**ขั้นที่ 2: Calculation Item ที่เลื่อน offset ไป −12 เดือน**
+
+```dax
+'LY (Offset)' =
+VAR SelectedOffsets =
+    SELECTCOLUMNS ( VALUES ( DimDate[MonthOffset] ), "@Prev", [MonthOffset] - 12 )
+RETURN
+    CALCULATE (
+        SELECTEDMEASURE (),
+        REMOVEFILTERS ( DimDate ),
+        DimDate[MonthOffset] IN SelectedOffsets
+    )
+```
+
+**อธิบาย:**
+- จับค่า `MonthOffset` ที่อยู่ใน filter context ปัจจุบัน แล้วลบ 12 → "เดือนเดิมปีก่อน"
+- เป็น filter ธรรมดาบนคอลัมน์ ไม่ override ทาง date relationship เหมือน Classic TI
+- ทำงานกับปฏิทินพิเศษ (4-4-5, Fiscal) ได้โดยไม่ต้องแก้สูตร
+
+**ตรวจสอบจากข้อมูลจริง (AdventureWorksDW2025):** `LY (Offset)` ให้ผล**ตรงกับ** `SAMEPERIODLASTYEAR` ทุกปี — เช่น Sales 2013 = 33,574,834 ทั้งคู่ ทำให้เทียบสองแนวทางใน Calculation Group เดียว (มีทั้ง `LY` และ `LY (Offset)`) ได้ทันที
+
+**ข้อควรระวัง:** `TODAY()` คำนวณตอน refresh — ถ้าข้อมูลเก่า ค่า offset จะเพี้ยน ต้อง refresh DimDate
+
+---
+
 ## 🎯 เปรียบเทียบ: With vs Without Calculation Group
 
 ### ตัวอย่างที่ 11: Without Calculation Group
@@ -448,6 +486,119 @@ Calculation Group: "Conversion Rate"
 - แล้วคูณด้วย Measure ที่เลือก (เช่น Total Sales)
 
 **หมายเหตุ:** ตัวอย่างใช้ AdventureWorksDW2025
+
+---
+
+### ตัวอย่างที่ 14: ข้อจำกัดของสูตรง่ายบนโมเดลหลายสกุลเงิน (วัดจากข้อมูลจริง)
+
+สูตรในตัวอย่างที่ 13 ถูกต้องเมื่อ **ยอดขายเก็บสกุลเดียว** แต่ FactResellerSales ของ AW เก็บหลายสกุลปนกัน (USD, CAD, GBP, EUR, AUD ฯลฯ) เมื่อวัดจริงจะเจอสามอาการ:
+
+| สถานการณ์ | อาการ | ตัวเลขจริง (ปี 2013) |
+|---|---|---|
+| ไม่เลือกสกุลใน slicer | `AVERAGE(rate)` เฉลี่ยข้ามทุกสกุลที่มี rate แล้วคูณยอดรวม | 33,574,834 → **16,487,164** (ไร้ความหมาย) |
+| เลือก GBP | relationship `DimCurrency → FactResellerSales` ตัดยอดเหลือแถว GBP ก่อน แล้วค่อยคูณ rate | **2,720,032** (ยอด nominal แถว GBP) ไม่ใช่ยอดทั้งบริษัทเป็นปอนด์ |
+| ทิศทาง rate | rate ของ AW = USD ต่อ 1 หน่วยของสกุล → `× rate` ได้แค่สกุลถิ่น→USD | เลือก THB แล้วเห็น "฿6,617" ซึ่งเป็นมูลค่า USD ของยอดบาท ไม่ใช่ยอดบาท |
+
+**บทเรียน:** สูตร DAX สั้นหรือยาวเป็นผลของการออกแบบโมเดล ไม่ใช่ฝีมือเขียนสูตร — ตัวอย่างสั้นบน Microsoft Learn สมมติว่ายอดเก็บสกุลเดียว + currency ไม่ผูกกับตารางขาย
+
+---
+
+### ตัวอย่างที่ 15: Display Currency — แปลงทุกสกุลเป็นสกุลที่เลือก (cross-rate)
+
+หัวใจ: แยกยอดเป็น **รายวัน × รายสกุลต้นทาง** แล้วแปลงผ่าน USD ด้วย rate ของวันนั้นจริง ๆ
+
+```dax
+'Conversion (EOD)' =
+// แปลงยอดขาย "ทุกสกุล" เป็นสกุลที่เลือกใน slicer (display currency)
+// วิธี: cross-rate รายวัน = ยอด x rate(สกุลต้นทาง) / rate(สกุลปลายทาง)
+VAR TargetKey =
+    SELECTEDVALUE ( DimCurrency[CurrencyKey] )          // สกุลปลายทางจาก slicer (สมมติเลือกเดียว)
+RETURN
+    IF (
+        ISBLANK ( TargetKey ),                          // ไม่เลือกสกุล = ไม่แปลง
+        SELECTEDMEASURE (),
+        CALCULATE (
+            SUMX (
+                SUMMARIZE ( FactResellerSales, DimDate[DateKey], FactResellerSales[CurrencyKey] ),   // แยกยอดรายวัน x รายสกุลต้นทาง (fact เก็บหลายสกุลปนกัน ต้องใช้ rate ของสกุลนั้นจริง ๆ)
+                VAR SourceRate =
+                    CALCULATE (
+                        MAX ( FactCurrencyRate[EndOfDayRate] ),
+                        TREATAS ( { FactResellerSales[CurrencyKey] }, FactCurrencyRate[CurrencyKey] )   // ทาบ key ตรง เพราะ fact กับ rate ไม่มี relationship ตรงกันเอง
+                    )
+                VAR TargetRate =
+                    CALCULATE (
+                        MAX ( FactCurrencyRate[EndOfDayRate] ),
+                        TREATAS ( { TargetKey }, FactCurrencyRate[CurrencyKey] )
+                    )
+                VAR Amount = SELECTEDMEASURE ()          // ยอดของ (วันนี้, สกุลต้นทางนี้)
+                RETURN
+                    DIVIDE ( Amount * SourceRate, TargetRate )   // เส้นทาง: สกุลต้นทาง -> USD -> สกุลปลายทาง
+            ),
+            REMOVEFILTERS ( DimCurrency )                // สำคัญ: filter จาก slicer ไหลเข้าตาราง rate ทาง relationship DimCurrency -> rate ทำให้เห็น rate อยู่สกุลเดียว ต้องล้างก่อนถึงจะหา cross-rate ได้ครบ
+        )
+    )
+```
+
+**Conversion (AVG):** ใช้โครงเดียวกัน เปลี่ยนคอลัมน์เป็น `FactCurrencyRate[AverageRate]` (rate เฉลี่ยของวัน แทน rate ปิดวัน)
+
+**ผลตรวจจากข้อมูลจริง (ปี 2013):** USD 32,324,839 / GBP 21,807,497 / THB 992,991,005 — สามค่าเทียบกันด้วย cross-rate ได้ตรงกันเอง (21.81M × rate GBP ÷ rate THB = 992.99M)
+
+---
+
+### ตัวอย่างที่ 16: Dynamic Format String ต่อสกุลเงิน
+
+**ขั้นที่ 1:** เพิ่มคอลัมน์ format ใน DimCurrency (หน้างานจริงมักโหลดจาก SQL) เช่น `"$"#,0.00`, `"€"#,0.00`, `"฿"#,0.00`
+
+**ขั้นที่ 2:** ตั้ง **Format string expression** ของ Calculation Item ตาม pattern ทางการของ Microsoft Learn:
+
+```dax
+SELECTEDVALUE (
+    DimCurrency[CurrencyFormatString],
+    SELECTEDMEASUREFORMATSTRING ()   // fallback: ใช้ format ของ Measure ต้นทาง (เช่น $ ของ Sales Amount)
+)
+```
+
+**ข้อควรรู้ (จาก Microsoft Learn):**
+- Dynamic format string มีผลเฉพาะใน **visual** — DAX Query จะเห็นแต่ตัวเลขดิบเสมอ
+- ถ้าแสดงผลเพี้ยน ให้เช็ค **Display units** ของ visual → เปลี่ยนจาก Auto เป็น None
+- หลาย Calculation Groups พร้อมกัน → **format ของ group ที่ Precedence สูงสุดชนะ**
+- `No conversion (USD)` ควรตั้ง format string เป็น `SELECTEDMEASUREFORMATSTRING()` เพื่อสืบทอด format ของ measure ต้นทาง (ไม่ hardcode)
+
+---
+
+### ตัวอย่างที่ 17: Inactive Relationship + USERELATIONSHIP กับสกุลเงิน
+
+ถ้า slicer สกุลเงินมีสองความหมายพร้อมกัน (กรองยอด + เลือกสกุลแสดงผล) ผู้ใช้จะตีความผิดง่าย วิธีแก้: ทำ `DimCurrency → FactResellerSales` เป็น **inactive** ให้ slicer เหลือความหมายเดียว แล้วเปิดใช้เฉพาะ measure ที่ต้องการ
+
+```dax
+// ยอดขายแยกตามสกุลที่บันทึกในแถว (transaction currency)
+// เปิด relationship ชั่วคราวด้วย USERELATIONSHIP เพราะความสัมพันธ์หลัก inactive
+'Sales (Recorded Currency)' =
+CALCULATE (
+    [Sales Amount],
+    USERELATIONSHIP ( DimCurrency[CurrencyKey], FactResellerSales[CurrencyKey] )
+)
+```
+
+**ระวัง:** Calculated Column ที่อาศัย relationship นี้ต้องแก้ตาม เช่น flag กรอง slicer:
+
+```dax
+'Has Exchange Rate' =
+// TRUE = สกุลนี้มีทั้ง rate และมียอดขายจริง → เลือกใน slicer แล้วมีตัวเลขเสมอ
+VAR HasRate =
+    CALCULATE ( COUNTROWS ( FactCurrencyRate ) ) > 0
+VAR HasSales =
+    CALCULATE (
+        COUNTROWS ( FactResellerSales ),
+        USERELATIONSHIP ( DimCurrency[CurrencyKey], FactResellerSales[CurrencyKey] )
+    ) > 0
+RETURN
+    HasRate && HasSales
+```
+
+(บนข้อมูลจริง: FactCurrencyRate มี rate แค่ 14 จาก 105 สกุลใน DimCurrency และมียอดขายจริงแค่ 6 สกุล — flag นี้กันผู้เรียนเลือกสกุลแล้วเจอ blank เฉย ๆ)
+
+**ผลตรวจ:** หลังทำ inactive — conversion ทุกค่าเท่าเดิมทุกตัว (GBP 2013 = 21,807,497 เหมือนเดิม) แต่ `Sales Amount` เมื่อเลือก GBP กลายเป็นยอดรวมทั้งบริษัท 39,358,118 แทนที่จะถูกตัดเหลือแถว GBP
 
 ---
 

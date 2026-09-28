@@ -226,6 +226,52 @@ CALCULATE(
 )
 ```
 
+#### CROSSFILTER() - กรณีใช้จริง: วัด Penetration ของ Reseller Network ⭐ (จากไฟล์จริง)
+
+**โจทย์ธุรกิจ:** เลือกหมวดสินค้า/ช่วงเวลาแล้ว มี Reseller กี่รายที่ขายได้จริง? ปัญหาคือ relationship ทุกเส้นเป็น single direction (`Dim → Fact`) filter จาก DimProduct/DimDate ไหลมาสุดที่ FactResellerSales แล้ว**หยุด** ไม่ย้อนไปกรอง DimReseller — `DISTINCTCOUNT(DimReseller[ResellerKey])` เลยได้ 701 (ทุกราย) เสมอ
+
+**แก้ด้วย CROSSFILTER(Both) แบบ "ชั่วคราวใน measure" ดีกว่าเปิด bidirectional ที่ relationship (กระทบทั้งโมเดล + ambiguity):**
+
+```dax
+// Reseller ที่ "มีการขายจริง" ตาม filter ปัจจุบัน (เช่น หมวดสินค้า/ช่วงเวลา)
+'Active Reseller Count' =
+CALCULATE (
+    DISTINCTCOUNT ( DimReseller[ResellerKey] ),
+    CROSSFILTER (
+        FactResellerSales[ResellerKey],  // จากฝั่ง Fact
+        DimReseller[ResellerKey],        // ย้อนกลับมากรองฝั่ง Dim
+        Both
+    )
+)
+
+// Reseller ที่ยังไม่มีการขาย — ใช้เป็น chase list ของทีมขาย
+// (วันที่/สินค้ากรองไม่ถึง DimReseller จึงนับ "ทั้งหมด" ได้ตรงนี้)
+'Inactive Reseller Count' =
+COUNTROWS ( DimReseller ) - [Active Reseller Count]
+
+// KPI penetration ของ reseller network
+'Active Reseller %' =
+DIVIDE ( [Active Reseller Count], COUNTROWS ( DimReseller ) )
+```
+
+**ผลตรวจจากข้อมูลจริง (AdventureWorksDW2025):**
+
+| หมวดสินค้า | ไม่มี CROSSFILTER | `Active Reseller Count` |
+|---|---|---|
+| Bikes | 701 | **587** |
+| Components | 701 | **580** |
+| Clothing | 701 | **475** |
+| Accessories | 701 | **346** |
+
+| ปี | Active | Inactive | Active % |
+|---|---|---|---|
+| 2010 | 38 | 663 | 5.4% |
+| 2011 | 251 | 450 | 35.8% |
+| 2012 | 401 | 300 | 57.2% |
+| 2013 | 489 | 212 | 69.8% |
+
+**ไฟล์ตัวอย่าง:** `Data Model - Reseller Sales.pbix` — *Trainer Material — ขอไฟล์จากผู้สอน*
+
 ---
 
 ### 5. ALLRELATED() และ ALLSELECTED()
@@ -461,6 +507,69 @@ DIVIDE(
     DISTINCTCOUNT(DimProduct[ProductKey])
 )
 ```
+
+---
+
+### 9. TREATAS() — Virtual Relationship
+
+**TREATAS()** ทาบค่าจากตารางหนึ่งไปเป็น filter ของอีกคอลัมน์หนึ่ง โดย**ไม่ต้องมี relationship จริงในโมเดล** — เหมาะกับกรณีที่ relationship ไม่มีอยู่ (ไม่ควรสร้าง) หรือคำนวณ list ของ key เองก่อน
+
+#### TREATAS() - Virtual Relationship ข้ามมิติ (DimDate → DimEmployee)
+
+```dax
+// นับพนักงานที่ถูกจ้าง "ในช่วงเวลาที่เลือกใน visual" (เช่น ปีจาก DimDate)
+// แม้ DimEmployee[HireDate] ไม่มี relationship กับ DimDate เลย
+// TREATAS ทาบค่าวันที่จาก DimDate ไปกรอง HireDate แบบ virtual
+'Employees Hired' =
+CALCULATE (
+    COUNT ( DimEmployee[EmployeeKey] ),
+    TREATAS ( VALUES ( DimDate[FullDateAlternateKey] ), DimEmployee[HireDate] )
+)
+```
+
+**อธิบาย:**
+- `VALUES(DimDate[FullDateAlternateKey])` = วันที่ที่อยู่ใน filter context ปัจจุบัน
+- `TREATAS(..., DimEmployee[HireDate])` = เอาค่าเหล่านั้นไปกรอง HireDate ราวกับมี relationship
+- จากไฟล์จริง `Data Model - Reseller Sales.pbix` — *Trainer Material — ขอไฟล์จากผู้สอน*
+
+#### TREATAS() - ทาบ Key List ที่คำนวณเอง (New Product Sales)
+
+```dax
+// ยอดขายที่มาจาก "สินค้าใหม่" = สินค้าที่ไม่เคยขายมาก่อนช่วงเวลาที่ดู
+// TREATAS รูปแบบที่สอง: คำนวณ list ของ ProductKey เองด้วย EXCEPT
+// (สินค้าใน context ปัจจุบัน - สินค้าที่เคยขายก่อนหน้านี้ทั้งหมด)
+// แล้วทาบกลับไปกรอง DimProduct[ProductKey] — ไม่ต้องแตะ relationship จริง
+'New Product Sales' =
+VAR CurrentProducts =
+    VALUES ( DimProduct[ProductKey] )
+VAR ProductsSoldBefore =
+    CALCULATETABLE (
+        VALUES ( FactResellerSales[ProductKey] ),
+        FILTER (
+            ALL ( DimDate ),
+            DimDate[FullDateAlternateKey] < MIN ( DimDate[FullDateAlternateKey] )
+        )
+    )
+VAR NewProducts =
+    EXCEPT ( CurrentProducts, ProductsSoldBefore )
+RETURN
+    CALCULATE ( [Sales Amount], TREATAS ( NewProducts, DimProduct[ProductKey] ) )
+```
+
+**ผลตรวจจากข้อมูลจริง:**
+
+| ปี | New Product Sales | อ่านค่า |
+|---|---|---|
+| 2010 | 489,329 | = ยอดขายทั้งหมด (ปีแรก ทุกสินค้า "ใหม่") |
+| 2011 | 3,830,126 | สินค้าที่เพิ่งเริ่มขายปีนี้ |
+| 2013 | 1,257 | แทบไม่มีของใหม่ — จับคู่กับ KPI portfolio ได้ |
+
+**เมื่อไหร่ใช้ TREATAS แทน relationship จริง:**
+- Budget/Target จากไฟล์ภายนอกที่ไม่ควรเพิ่ม relationship ในโมเดล
+- Filter แบบคำนวณเอง (เช่น EXCEPT, TOPN, ผลของ measure)
+- อยากเก็บโมเดลให้ relationship น้อยและชัด (ดีต่อ VertiPaq/การบำรุงรักษา)
+
+---
 
 ---
 
